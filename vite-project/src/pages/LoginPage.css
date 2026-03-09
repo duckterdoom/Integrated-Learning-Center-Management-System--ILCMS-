@@ -1,0 +1,308 @@
+/* ============================
+   Login Page Styles
+   ============================ */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.login-page {
+  min-height: 100vh;
+  width: 100%;
+  background-color: #e8e8e8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* ---- Card ---- */
+.login-card {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 50px rgba(0, 0, 0, 0.16);
+  width: 560px;
+  overflow: hidden;
+}
+
+/* ---- Red Header ---- */
+.login-header {
+  background: #cc0000;
+  padding: 40px 20px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 170px;
+}
+
+.logo-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.login-logo-img {
+  max-width: 220px;
+  height: auto;
+  object-fit: contain;
+}
+
+/* ---- Form ---- */
+.login-form {
+  padding: 40px 48px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ---- Input Group ---- */
+.input-group {
+  display: flex;
+  align-items: center;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 10px;
+  background: #fff;
+  margin-bottom: 22px;
+  transition: border-color 0.2s;
+  overflow: hidden;
+}
+
+.input-group:focus-within {
+  border-color: #aaa;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.07);
+}
+
+.input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  color: #888;
+  flex-shrink: 0;
+}
+
+.login-input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 18px 8px 18px 0;
+  font-size: 17px;
+  color: #333;
+  background: transparent;
+  font-family: inherit;
+}
+
+.login-input::placeholder {
+  color: #bbb;
+}
+
+.toggle-password {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  color: #888;
+  transition: color 0.2s;
+}
+
+.toggle-password:hover {
+  color: #555;
+}
+
+/* ---- Reset Link Row ---- */
+.reset-link-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 26px;
+  margin-top: 2px;
+}
+
+.reset-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 15px;
+  color: #1a73e8;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color 0.2s;
+}
+
+.reset-link:hover {
+  color: #1558b0;
+  text-decoration: underline;
+}
+
+/* ---- Login Button ---- */
+.btn-login {
+  width: 100%;
+  padding: 18px;
+  background: #28a745;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  letter-spacing: 0.4px;
+  transition: background 0.2s, transform 0.1s;
+  margin-bottom: 16px;
+  font-family: inherit;
+}
+
+.btn-login:hover {
+  background: #218838;
+}
+
+.btn-login:active {
+  transform: scale(0.99);
+}
+
+/* ---- Google Button ---- */
+.btn-google {
+  width: 100%;
+  padding: 16px 14px;
+  background: #fff;
+  color: #555;
+  font-size: 17px;
+  font-weight: 500;
+  border: 1.5px solid #d0d0d0;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  font-family: inherit;
+}
+
+.btn-google:hover {
+  background: #f8f8f8;
+  border-color: #aaa;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+
+.google-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* ============================
+   Reset Account Modal
+   ============================ */
+
+/* Dark semi-transparent backdrop */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.18s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Modal card */
+.modal-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 12px 50px rgba(0, 0, 0, 0.22);
+  width: 500px;
+  overflow: hidden;
+  animation: slideUp 0.22s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Red header */
+.modal-header {
+  background: #cc0000;
+  padding: 26px 32px;
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.6;
+  text-align: center;
+  font-weight: 400;
+}
+
+/* White body */
+.modal-body {
+  padding: 28px 32px 32px;
+}
+
+/* Reduced margin for modal input */
+.modal-input-group {
+  margin-bottom: 28px;
+}
+
+/* Back & Send button row */
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.btn-back {
+  padding: 12px 28px;
+  background: #6c757d;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btn-back:hover {
+  background: #5a6268;
+}
+
+.btn-send {
+  padding: 12px 28px;
+  background: #28a745;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.2s;
+}
+
+.btn-send:hover {
+  background: #218838;
+}
+
+/* Success state */
+.modal-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 0 6px;
+  color: #28a745;
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+}
