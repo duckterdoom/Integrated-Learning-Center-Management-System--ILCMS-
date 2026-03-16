@@ -1,6 +1,14 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './LoginPage.css';
 import ismartLogo from '../assets/ismart-logo.png';
+
+/* ── Hardcoded credentials ── */
+const USERS = {
+  admin:  { password: 'admin123', route: '/admin' },
+  staff:  { password: 'staff123', route: '/staff' },
+  saler:  { password: 'saler123', route: '/saler' },
+};
 
 /* ── Reset Account Modal ── */
 function ResetModal({ onClose }) {
@@ -38,7 +46,6 @@ function ResetModal({ onClose }) {
               {/* Email input */}
               <div className="input-group modal-input-group">
                 <span className="input-icon">
-                  {/* Envelope icon */}
                   <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
                     <polyline points="22,6 12,13 2,6"/>
@@ -74,18 +81,22 @@ function ResetModal({ onClose }) {
 
 /* ── Main Login Page ── */
 function LoginPage() {
-  const [email, setEmail] = useState('');
+  const navigate = useNavigate();
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showReset, setShowReset] = useState(false);
+  const [error, setError] = useState('');
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log('Login attempted:', { email, password });
-  };
-
-  const handleGoogleLogin = () => {
-    console.log('Google login clicked');
+    setError('');
+    const user = USERS[username.toLowerCase()];
+    if (user && user.password === password) {
+      navigate(user.route);
+    } else {
+      setError('Invalid username or password.');
+    }
   };
 
   return (
@@ -100,7 +111,7 @@ function LoginPage() {
 
         {/* Form */}
         <form className="login-form" onSubmit={handleLogin}>
-          {/* Email Input */}
+          {/* Username Input */}
           <div className="input-group">
             <span className="input-icon">
               <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#888" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -109,12 +120,13 @@ function LoginPage() {
               </svg>
             </span>
             <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => { setUsername(e.target.value); setError(''); }}
               className="login-input"
               required
+              autoComplete="username"
             />
           </div>
 
@@ -130,9 +142,10 @@ function LoginPage() {
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) => { setPassword(e.target.value); setError(''); }}
               className="login-input"
               required
+              autoComplete="current-password"
             />
             <button
               type="button"
@@ -156,6 +169,9 @@ function LoginPage() {
             </button>
           </div>
 
+          {/* Error message */}
+          {error && <p className="login-error">{error}</p>}
+
           {/* Reset link */}
           <div className="reset-link-row">
             <button
@@ -171,7 +187,6 @@ function LoginPage() {
           <button type="submit" className="btn-login">
             Login
           </button>
-
         </form>
       </div>
 

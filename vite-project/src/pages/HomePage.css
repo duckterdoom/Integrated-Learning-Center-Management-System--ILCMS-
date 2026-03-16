@@ -1,0 +1,269 @@
+/* ── Navbar ── */
+.navbar {
+  background-color: #cc0000;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+  gap: 4px;
+}
+
+.navbar-logo {
+  height: 44px;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #fff;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 13px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: background 0.15s;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.nav-item svg {
+  flex-shrink: 0;
+  width: 17px;
+  height: 17px;
+}
+
+.navbar-spacer {
+  flex: 1;
+}
+
+.navbar-search {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 4px;
+  padding: 6px 10px;
+  gap: 6px;
+  margin-right: 10px;
+}
+
+.navbar-search input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 160px;
+  background: transparent;
+}
+
+.navbar-search svg {
+  width: 16px;
+  height: 16px;
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 8px 10px;
+  border-radius: 4px;
+  transition: background 0.15s;
+}
+
+.navbar-user:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.navbar-user svg {
+  width: 17px;
+  height: 17px;
+}
+
+/* ── Breadcrumb ── */
+.breadcrumb {
+  padding: 10px 24px;
+  font-size: 14px;
+  color: #555;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+/* ── Page Content ── */
+.home-content {
+  padding: 20px 24px;
+  background: #e8e8e8;
+  min-height: calc(100vh - 60px - 39px);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Spacer pushes bottom section down */
+.home-content-spacer {
+  flex: 1;
+}
+
+/* ── My Class Table ── */
+.my-class-section {
+  background: #fff;
+  border: 2px solid #1a73e8;
+  border-radius: 4px;
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.my-class-header {
+  background: #cc0000;
+  color: #fff;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.my-class-header svg {
+  width: 18px;
+  height: 18px;
+}
+
+.my-class-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.my-class-table th {
+  background: #fff;
+  padding: 11px 16px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-weight: 600;
+  color: #333;
+}
+
+.my-class-table td {
+  padding: 11px 16px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee;
+  color: #333;
+}
+
+.my-class-table td:first-child,
+.my-class-table th:first-child {
+  width: 70px;
+}
+
+.my-class-table td.class-link {
+  color: #1a73e8;
+  cursor: pointer;
+  text-align: left;
+}
+
+.my-class-table td.class-link:hover {
+  text-decoration: underline;
+}
+
+/* ── Bottom section (tabs + cards) ── */
+.bottom-section {
+  margin-top: 28px;
+}
+
+/* ── Bottom Tabs ── */
+.bottom-tabs {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.bottom-tabs-header {
+  display: flex;
+  border-bottom: 1px solid #ccc;
+}
+
+.bottom-tab {
+  padding: 10px 16px;
+  font-size: 13px;
+  border-right: 1px solid #ccc;
+  cursor: pointer;
+  white-space: nowrap;
+  color: #333;
+  background: #fff;
+  transition: background 0.15s;
+}
+
+.bottom-tab:hover {
+  background: #f5f5f5;
+}
+
+.bottom-tab-content {
+  padding: 12px 16px;
+  min-height: 44px;
+  font-size: 14px;
+  color: #555;
+}
+
+/* ── Bottom Cards ── */
+.bottom-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.bottom-card {
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid #ddd;
+}
+
+.bottom-card-header {
+  background: #cc0000;
+  color: #fff;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.bottom-card-header svg {
+  width: 17px;
+  height: 17px;
+}
+
+.bottom-card-body {
+  padding: 16px;
+}
+
+.btn-green {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 9px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-green:hover {
+  background: #218838;
+}

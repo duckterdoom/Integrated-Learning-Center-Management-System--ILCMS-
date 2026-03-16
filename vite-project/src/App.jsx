@@ -1,7 +1,20 @@
-import LoginPage from './pages/LoginPage'
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import LoginPage from './pages/LoginPage';
+import AdminHomePage from './pages/AdminHomePage';
+import StaffHomePage from './pages/StaffHomePage';
+import SalerHomePage from './pages/SalerHomePage';
 
 function App() {
-  return <LoginPage />
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LoginPage />} />
+        <Route path="/admin" element={<AdminHomePage />} />
+        <Route path="/staff" element={<StaffHomePage />} />
+        <Route path="/saler" element={<SalerHomePage />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;

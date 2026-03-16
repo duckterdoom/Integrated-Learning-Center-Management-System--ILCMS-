@@ -294,6 +294,14 @@
   background: #218838;
 }
 
+/* Login error */
+.login-error {
+  color: #cc0000;
+  font-size: 13px;
+  margin: -4px 0 6px 0;
+  text-align: center;
+}
+
 /* Success state */
 .modal-success {
   display: flex;
