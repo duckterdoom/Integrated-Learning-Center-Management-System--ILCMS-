@@ -1,0 +1,323 @@
+/* ── Page layout ── */
+.manage-page {
+  padding: 24px 28px;
+  background: #e8e8e8;
+  min-height: calc(100vh - 60px - 39px);
+}
+
+.manage-page-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.manage-page-title {
+  font-size: 24px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+.btn-add {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.btn-add:hover {
+  background: #218838;
+}
+
+/* ── Account list box ── */
+.account-list-box {
+  background: #fff;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+  overflow: hidden;
+}
+
+.account-list-header {
+  padding: 14px 18px 0;
+}
+
+.account-list-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 12px;
+}
+
+.account-search {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 7px 12px;
+  gap: 8px;
+  width: 200px;
+  margin-bottom: 14px;
+  background: #fff;
+}
+
+.account-search input {
+  border: none;
+  outline: none;
+  font-size: 14px;
+  width: 100%;
+  background: transparent;
+  color: #333;
+}
+
+.account-search svg {
+  flex-shrink: 0;
+  color: #888;
+}
+
+/* ── Table ── */
+.account-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.account-table th {
+  background: #f5f5f5;
+  padding: 11px 16px;
+  text-align: center;
+  border-top: 1px solid #e0e0e0;
+  border-bottom: 1px solid #e0e0e0;
+  font-weight: 600;
+  color: #444;
+  font-size: 13px;
+}
+
+.account-table td {
+  padding: 11px 16px;
+  text-align: center;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.account-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.account-table td.td-username {
+  font-style: italic;
+}
+
+/* ── Role Badge ── */
+.role-badge {
+  display: inline-block;
+  padding: 3px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.role-badge.admin {
+  background: #f5c6cb;
+  color: #721c24;
+}
+
+.role-badge.sale {
+  background: #c3e6cb;
+  color: #155724;
+}
+
+.role-badge.staff {
+  background: #b8daff;
+  color: #004085;
+}
+
+/* ── Action icons ── */
+.action-icons {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 3px;
+  display: flex;
+  align-items: center;
+  color: #555;
+  transition: color 0.15s;
+}
+
+.action-btn:hover {
+  color: #222;
+}
+
+.action-btn.danger {
+  color: #cc0000;
+}
+
+.action-btn.danger:hover {
+  color: #900;
+}
+
+/* ── Pagination ── */
+.account-pagination {
+  padding: 12px 18px;
+  background: #f5f5f5;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 4px;
+}
+
+.page-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background: #1a73e8;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Modal overlay ── */
+.ma-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.ma-modal {
+  background: #fff;
+  border-radius: 12px;
+  border: 2px solid #1a73e8;
+  padding: 36px 40px 32px;
+  width: 520px;
+  max-width: 95vw;
+}
+
+.ma-modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 28px;
+}
+
+.ma-field {
+  margin-bottom: 20px;
+}
+
+.ma-label {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 8px;
+}
+
+.ma-input {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #e8e8e8;
+  font-size: 15px;
+  color: #333;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.ma-input:focus {
+  background: #dde5f0;
+}
+
+.ma-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #e8e8e8;
+  font-size: 15px;
+  color: #333;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.ma-select-wrapper {
+  position: relative;
+}
+
+.ma-select-wrapper::after {
+  content: '▾';
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #888;
+  pointer-events: none;
+  font-size: 14px;
+}
+
+.ma-modal-actions {
+  display: flex;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+.ma-btn-submit {
+  flex: 1;
+  background: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ma-btn-submit:hover {
+  background: #a00000;
+}
+
+.ma-btn-cancel {
+  flex: 1;
+  background: #fff;
+  color: #333;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.ma-btn-cancel:hover {
+  border-color: #999;
+}
+
+.ma-error {
+  color: #cc0000;
+  font-size: 13px;
+  margin-top: 6px;
+}
