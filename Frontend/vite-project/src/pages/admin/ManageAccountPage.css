@@ -182,14 +182,20 @@
   height: 28px;
   border-radius: 4px;
   border: 1px solid #ccc;
-  background: #1a73e8;
-  color: #fff;
+  background: #fff;
+  color: #333;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.page-btn.active {
+  background: #1a73e8;
+  color: #fff;
+  border-color: #1a73e8;
 }
 
 /* ── Modal overlay ── */
@@ -320,4 +326,80 @@
   color: #cc0000;
   font-size: 13px;
   margin-top: 6px;
+}
+
+/* ── Info icon button ── */
+.action-info-btn {
+  color: #333;
+  padding: 2px;
+}
+
+.action-info-btn:hover {
+  color: #1a73e8;
+}
+
+/* ── Info modal header ── */
+.ma-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 28px;
+  gap: 12px;
+}
+
+/* ── Info field rows ── */
+.ma-info-field {
+  margin-bottom: 16px;
+}
+
+.ma-info-label {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 4px;
+}
+
+.ma-info-value {
+  font-size: 15px;
+  color: #444;
+  margin: 0;
+  padding-left: 2px;
+}
+
+/* ── Remove button (red, same width as submit) ── */
+.ma-btn-remove {
+  flex: 1;
+  background: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.ma-btn-remove:hover {
+  background: #a00000;
+}
+
+/* ── Confirm delete modal ── */
+.ma-confirm-modal {
+  border-color: #ddd;
+  text-align: center;
+}
+
+.ma-confirm-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 2rem;
+  line-height: 1.4;
+}
+
+/* ── Wide buttons for confirm dialog ── */
+.ma-btn-wide {
+  flex: 1;
+  min-width: 140px;
 }
