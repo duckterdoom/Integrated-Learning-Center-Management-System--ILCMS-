@@ -7,192 +7,210 @@ A web-based management platform for learning centers, supporting three user role
 ## Table of Contents
 
 1. [Tech Stack](#tech-stack)
-2. [Prerequisites — What to Install](#prerequisites--what-to-install)
-3. [Step 1 — Set Up the Database](#step-1--set-up-the-database)
-4. [Step 2 — Set Up the Backend](#step-2--set-up-the-backend)
-5. [Step 3 — Set Up the Frontend](#step-3--set-up-the-frontend)
-6. [Step 4 — Run the Project](#step-4--run-the-project)
-7. [Default Login Accounts](#default-login-accounts)
-8. [Project Structure](#project-structure)
-9. [Troubleshooting](#troubleshooting)
+2. [Tester Setup Guide](#tester-setup-guide)
+3. [Developer Setup Guide](#developer-setup-guide)
+4. [Login Accounts](#login-accounts)
+5. [Project Structure](#project-structure)
+6. [Troubleshooting](#troubleshooting)
 
 ---
 
 ## Tech Stack
 
-| Layer     | Technology                  | Port  |
-|-----------|-----------------------------|-------|
-| Frontend  | React 19 + Vite             | 5173  |
-| Backend   | Node.js + Express.js        | 5000  |
-| Database  | MySQL                        | 3306  |
+| Layer    | Technology           | Port |
+|----------|----------------------|------|
+| Frontend | React 19 + Vite      | 5173 |
+| Backend  | Node.js + Express.js | 5000 |
+| Database | MySQL (via Laragon)  | 3306 |
 
 ---
 
-## Prerequisites — What to Install
+## Tester Setup Guide
 
-Before running the project, install the following tools on your machine. Each link goes to the official download page.
-
-### 1. Node.js (v18 or higher)
-- Download: https://nodejs.org/en/download
-- Choose the **LTS** version (recommended)
-- After installing, verify in a terminal:
-  ```
-  node -v
-  npm -v
-  ```
-  You should see version numbers printed (e.g. `v20.x.x`).
-
-### 2. MySQL Server
-You can install MySQL in one of two ways:
-
-**Option A — XAMPP (easiest for beginners):**
-- Download: https://www.apachefriends.org/download.html
-- Install XAMPP, then open the **XAMPP Control Panel** and click **Start** next to **MySQL**
-
-**Option B — MySQL Community Server (standalone):**
-- Download: https://dev.mysql.com/downloads/mysql/
-- During installation, set a root password and remember it
-
-### 3. MySQL Workbench (recommended GUI tool)
-- Download: https://dev.mysql.com/downloads/workbench/
-- Used to run SQL scripts and view the database visually
-- Alternative: use **phpMyAdmin** if you installed XAMPP (open browser → http://localhost/phpmyadmin)
-
-### 4. Git (optional, for cloning)
-- Download: https://git-scm.com/downloads
+> Steps 1–7 are done **once only**.
+> From next time: open Laragon → Start All → then run Steps 8 and 9 only.
 
 ---
 
-## Step 1 — Set Up the Database
+### Step 1 — Install Node.js
 
-### 1.1 — Start MySQL
-- **XAMPP users:** Open XAMPP Control Panel → click **Start** next to MySQL
-- **Standalone MySQL users:** MySQL should already be running as a Windows service
+1. Go to https://nodejs.org/en/download
+2. Click **LTS** version → Download
+3. Run the installer → click **Next** until **Finish**
+4. Verify: open **Command Prompt** → type `node -v` → should show a version number
 
-### 1.2 — Create the Database and Tables
+---
 
-1. Open **MySQL Workbench** (or phpMyAdmin)
-2. Connect to your local MySQL server (host: `localhost`, user: `root`)
-3. Open the file:
-   ```
-   Backend/database/schema.sql
-   ```
-4. Run the entire file — this will:
-   - Create the database `ilcms_db`
-   - Create all tables (Role, User, Course, Class, Student, Enrollment, Attendance, Score)
-   - Insert the three roles: Admin, Staff, Sale
+### Step 2 — Install Git
 
-### 1.3 — Configure the Backend Database Password
+1. Go to https://git-scm.com/downloads
+2. Click **Download for Windows**
+3. Run the installer → click **Next** until **Finish**
+4. Verify: open **Command Prompt** → type `git --version` → should show a version number
 
-Open the file `Backend/.env` in any text editor (Notepad, VS Code, etc.):
+---
 
-```env
-PORT=5000
-CLIENT_URL=http://localhost:5173
+### Step 3 — Install Laragon
 
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_mysql_password_here   ← change this line
-DB_NAME=ilcms_db
+1. Go to https://laragon.org/download
+2. Click **Download Laragon Full**
+3. Run the installer → click **Next** until **Finish**
+4. Laragon opens automatically after install
 
-JWT_SECRET=ilcms_jwt_access_secret_change_me_in_production
-JWT_REFRESH_SECRET=ilcms_jwt_refresh_secret_change_me_in_production
-JWT_ACCESS_EXPIRES=15m
-JWT_REFRESH_EXPIRES=7d
+---
 
-BCRYPT_ROUNDS=10
+### Step 4 — Start Laragon
+
+1. Open **Laragon** from your Desktop or Start menu
+2. Click **Start All**
+3. Wait until **MySQL** shows green ✓
+
+```
+Apache  ● Running
+MySQL   ● Running  ← must be green before continuing
 ```
 
-Replace `your_mysql_password_here` with your actual MySQL root password.
-- XAMPP default: leave it empty (`DB_PASSWORD=`)
-- If you set a password during MySQL installation, enter that password
+> Keep Laragon running in the background at all times while using the app.
 
 ---
 
-## Step 2 — Set Up the Backend
+### Step 5 — Clone the Project
 
-Open a terminal (Command Prompt or PowerShell) and run:
+Open **Command Prompt** and run:
 
 ```bash
-# 1. Navigate to the Backend folder
-cd "path\to\ILCMS\Backend"
-
-# 2. Install dependencies (only needed once)
-npm install
-
-# 3. Seed the default Admin account into the database (only needed once)
-node database/seed.js
+git clone https://github.com/duckterdoom/Integrated-Learning-Center-Management-System--ILCMS-.git C:\laragon\www\ILCMS
 ```
 
-If the seed runs successfully you will see:
-```
-✓ Admin account seeded (username: admin)
-```
+Wait until it finishes downloading.
 
 ---
 
-## Step 3 — Set Up the Frontend
+### Step 6 — Import the Database
 
-Open a **second** terminal and run:
+In the same **Command Prompt**, run:
 
 ```bash
-# 1. Navigate to the Frontend project folder
-cd "path\to\ILCMS\Frontend\vite-project"
+C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysql.exe -u root < "C:\laragon\www\ILCMS\Backend\database\backup.sql"
+```
 
-# 2. Install dependencies (only needed once)
+No errors = database imported successfully ✓
+
+> **If you see "The system cannot find the path":**
+> Open `C:\laragon\bin\mysql\` in File Explorer, check the folder name inside,
+> then replace `mysql-8.0.30-winx64` in the command with that folder name.
+
+---
+
+### Step 7 — Install Dependencies
+
+Run these commands one by one:
+
+```bash
+cd C:\laragon\www\ILCMS\Backend
 npm install
 ```
 
+```bash
+cd C:\laragon\www\ILCMS\Frontend\vite-project
+npm install
+```
+
+Wait until both finish.
+
 ---
 
-## Step 4 — Run the Project
+### Step 8 — Start the Backend
 
-You need **two terminals open at the same time** — one for the backend, one for the frontend.
+Open **Command Prompt** and run (keep this window open):
 
-### Terminal 1 — Start the Backend
 ```bash
-cd "path\to\ILCMS\Backend"
+cd C:\laragon\www\ILCMS\Backend
 npm run dev
 ```
+
 You should see:
 ```
-Server running on port 5000
-Database connected
+Server running on http://localhost:5000
 ```
 
-### Terminal 2 — Start the Frontend
+---
+
+### Step 9 — Start the Frontend
+
+Open a **second Command Prompt** and run (keep this window open):
+
 ```bash
-cd "path\to\ILCMS\Frontend\vite-project"
+cd C:\laragon\www\ILCMS\Frontend\vite-project
 npm run dev
 ```
+
 You should see:
 ```
-VITE v7.x.x  ready in xxx ms
-➜  Local:   http://localhost:5173/
+➜  Local: http://localhost:5173/
 ```
 
-### Open the App
+---
+
+### Step 10 — Open the App
+
 Open your browser and go to:
 ```
 http://localhost:5173
 ```
 
-> **Important:** Both terminals must stay open while using the app. Closing either one will stop that part of the system.
+---
+
+> ⚠️ **Important:**
+> - Laragon must be running (MySQL green) at all times
+> - Both Command Prompt windows (Steps 8 and 9) must stay open
+> - From next time: just open Laragon → Start All → run Steps 8 and 9
 
 ---
 
-## Default Login Accounts
+## Developer Setup Guide
 
-After running the seed script, the following account is available:
+### Prerequisites
+- Laragon: https://laragon.org/download
+- Node.js: https://nodejs.org/en/download
+- Git: https://git-scm.com/downloads
 
-| Role  | Username | Password  |
-|-------|----------|-----------|
+### Setup
+
+```bash
+# 1. Navigate to Backend
+cd "path\to\ILCMS\Backend"
+
+# 2. Install dependencies
+npm install
+
+# 3. Create database and tables
+node database/setup.js
+```
+
+### Run
+
+```bash
+# Terminal 1 — Backend
+cd "path\to\ILCMS\Backend"
+npm run dev
+
+# Terminal 2 — Frontend
+cd "path\to\ILCMS\Frontend\vite-project"
+npm run dev
+```
+
+Open browser → **http://localhost:5173**
+
+---
+
+## Login Accounts
+
+| Role  | Username | Password   |
+|-------|----------|------------|
 | Admin | `admin`  | `admin123` |
-
-**To create Staff or Sale accounts:**
-1. Log in as Admin
-2. Go to **Manage Account** in the top navigation bar
-3. Click **Add Account** and fill in the form
+| Staff | `staff`  | `staff123` |
+| Sale  | `sale`   | `sale123`  |
 
 ---
 
@@ -200,53 +218,57 @@ After running the seed script, the following account is available:
 
 ```
 ILCMS/
-├── Backend/                    ← Node.js + Express API
+├── Backend/                     ← Node.js + Express API
 │   ├── config/
-│   │   └── db.js               ← MySQL connection pool
-│   ├── controllers/            ← Business logic (auth, users)
+│   │   └── db.js                ← MySQL connection pool
+│   ├── controllers/             ← Business logic (auth, users)
 │   ├── database/
-│   │   ├── schema.sql          ← Run this first to create DB + tables
-│   │   └── seed.js             ← Run this once to create Admin account
-│   ├── middleware/             ← JWT auth, request validation
-│   ├── routes/                 ← API route definitions
-│   ├── .env                    ← Environment config (DB password, JWT secrets)
-│   └── server.js               ← App entry point
+│   │   ├── backup.sql           ← Database backup (import once)
+│   │   ├── schema.sql           ← Database schema reference
+│   │   ├── setup.js             ← Dev only: creates DB + tables
+│   │   └── seed.js              ← Dev only: seeds Admin account
+│   ├── middleware/              ← JWT auth, request validation
+│   ├── routes/                  ← API route definitions
+│   ├── .env                     ← Environment config
+│   └── server.js                ← App entry point
 │
 └── Frontend/
-    └── vite-project/           ← React + Vite app
+    └── vite-project/            ← React + Vite app
         ├── public/
         │   └── ismart-favicon.png
         └── src/
-            ├── App.jsx         ← Routes and role-based access control
-            ├── assets/         ← Logo images
+            ├── App.jsx          ← Routes and role-based access control
+            ├── assets/          ← Logo images
             └── pages/
-                ├── auth/       ← LoginPage
-                ├── admin/      ← AdminHomePage, ManageAccountPage
-                ├── staff/      ← StaffHomePage
-                └── saler/      ← SalerHomePage
+                ├── auth/        ← LoginPage
+                ├── admin/       ← AdminHomePage, ManageAccountPage
+                ├── staff/       ← StaffHomePage
+                └── saler/       ← SalerHomePage
 ```
 
 ---
 
 ## Troubleshooting
 
-**"Cannot connect to database" / backend crashes on start**
-- Make sure MySQL is running (check XAMPP Control Panel or Windows Services)
-- Double-check `DB_PASSWORD` in `Backend/.env`
-- Make sure you ran `schema.sql` to create the `ilcms_db` database
+**"mysql is not recognized" in Step 2**
+- Open `C:\laragon\bin\mysql\` and check your folder name
+- Replace `mysql-8.0.30-winx64` in the command with that folder name
+
+**Step 2 shows errors when importing**
+- Make sure Laragon is running and MySQL is green
+- Try with no password: remove `-pviet` from the command
 
 **"npm install" fails**
 - Make sure Node.js is installed: run `node -v` in terminal
-- Try deleting the `node_modules` folder and running `npm install` again
+- Delete the `node_modules` folder and run `npm install` again
 
-**Login shows "Invalid credentials"**
-- Make sure you ran `node database/seed.js` from inside the `Backend` folder
-- Check that the backend terminal is still running (port 5000)
+**Login shows "Invalid username or password"**
+- Make sure the database was imported correctly (Step 2)
+- Make sure the backend terminal is still running (port 5000)
 
 **Page shows blank / "Cannot GET /"**
 - Make sure the frontend terminal is running (port 5173)
 - Open `http://localhost:5173` not `http://localhost:5000`
 
 **Port already in use**
-- Another program is using port 5000 or 5173
 - Stop other Node.js processes or restart your computer
