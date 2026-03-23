@@ -7,11 +7,12 @@ A web-based management platform for learning centers, supporting three user role
 ## Table of Contents
 
 1. [Tech Stack](#tech-stack)
-2. [Tester Setup Guide](#tester-setup-guide)
-3. [Developer Setup Guide](#developer-setup-guide)
-4. [Login Accounts](#login-accounts)
-5. [Project Structure](#project-structure)
-6. [Troubleshooting](#troubleshooting)
+2. [Hướng dẫn cài đặt cho Tester (Tiếng Việt)](#hướng-dẫn-cài-đặt-cho-tester-tiếng-việt)
+3. [Tester Setup Guide (English)](#tester-setup-guide-english)
+4. [Developer Setup Guide](#developer-setup-guide)
+5. [Login Accounts / Tài khoản đăng nhập](#login-accounts--tài-khoản-đăng-nhập)
+6. [Project Structure](#project-structure)
+7. [Troubleshooting / Xử lý lỗi](#troubleshooting--xử-lý-lỗi)
 
 ---
 
@@ -25,7 +26,153 @@ A web-based management platform for learning centers, supporting three user role
 
 ---
 
-## Tester Setup Guide
+## Hướng dẫn cài đặt cho Tester (Tiếng Việt)
+
+> Các bước 1–7 chỉ thực hiện **một lần duy nhất**.
+> Từ lần sau: mở Laragon → Start All → chạy Bước 8 và 9 là xong.
+
+---
+
+### Bước 1 — Cài đặt Node.js
+
+1. Truy cập https://nodejs.org/en/download
+2. Chọn phiên bản **LTS** → Download
+3. Chạy file cài đặt → bấm **Next** đến khi **Finish**
+4. Kiểm tra: mở **Command Prompt** → gõ `node -v` → hiện số phiên bản là thành công ✓
+
+---
+
+### Bước 2 — Cài đặt Git
+
+1. Truy cập https://git-scm.com/downloads
+2. Bấm **Download for Windows**
+3. Chạy file cài đặt → bấm **Next** đến khi **Finish**
+4. Kiểm tra: mở **Command Prompt** → gõ `git --version` → hiện số phiên bản là thành công ✓
+
+---
+
+### Bước 3 — Cài đặt Laragon
+
+> Laragon đã bao gồm MySQL bên trong — **không cần cài MySQL riêng**.
+
+1. Truy cập https://laragon.org/download
+2. Bấm **Download Laragon Full**
+3. Chạy file cài đặt → bấm **Next** đến khi **Finish**
+4. Laragon tự động mở sau khi cài xong
+
+---
+
+### Bước 4 — Khởi động Laragon
+
+1. Mở **Laragon** từ màn hình Desktop hoặc Start menu
+2. Bấm **Start All**
+3. Chờ đến khi **MySQL** chuyển sang màu **xanh** ✓
+
+```
+Apache  ● Running
+MySQL   ● Running  ← phải xanh mới tiếp tục
+```
+
+> Giữ Laragon chạy nền trong suốt quá trình sử dụng ứng dụng.
+
+---
+
+### Bước 5 — Tải source code về máy
+
+Mở **Command Prompt** và chạy lệnh sau:
+
+```bash
+git clone https://github.com/duckterdoom/Integrated-Learning-Center-Management-System--ILCMS-.git C:\laragon\www\ILCMS
+```
+
+Chờ đến khi tải xong.
+
+---
+
+### Bước 6 — Import database
+
+Trong cùng cửa sổ **Command Prompt**, chạy:
+
+```bash
+C:\laragon\bin\mysql\mysql-8.0.30-winx64\bin\mysql.exe -u root < "C:\laragon\www\ILCMS\Backend\database\backup.sql"
+```
+
+Không có thông báo lỗi = import thành công ✓
+
+> **Nếu thấy lỗi "The system cannot find the path":**
+> Mở thư mục `C:\laragon\bin\mysql\` trong File Explorer,
+> xem tên thư mục bên trong rồi thay `mysql-8.0.30-winx64`
+> trong lệnh trên bằng tên thư mục đó.
+
+---
+
+### Bước 7 — Cài đặt thư viện
+
+Chạy từng lệnh sau:
+
+```bash
+cd C:\laragon\www\ILCMS\Backend
+npm install
+```
+
+```bash
+cd C:\laragon\www\ILCMS\Frontend\vite-project
+npm install
+```
+
+Chờ đến khi cả hai hoàn tất.
+
+---
+
+### Bước 8 — Khởi động Backend
+
+Mở **Command Prompt** và chạy (giữ cửa sổ này mở):
+
+```bash
+cd C:\laragon\www\ILCMS\Backend
+npm run dev
+```
+
+Thấy dòng này là thành công:
+```
+Server running on http://localhost:5000
+```
+
+---
+
+### Bước 9 — Khởi động Frontend
+
+Mở **Command Prompt thứ hai** và chạy (giữ cửa sổ này mở):
+
+```bash
+cd C:\laragon\www\ILCMS\Frontend\vite-project
+npm run dev
+```
+
+Thấy dòng này là thành công:
+```
+➜  Local: http://localhost:5173/
+```
+
+---
+
+### Bước 10 — Mở ứng dụng
+
+Mở trình duyệt và truy cập:
+```
+http://localhost:5173
+```
+
+---
+
+> ⚠️ **Lưu ý quan trọng:**
+> - Laragon phải luôn chạy (MySQL xanh) trong khi dùng app
+> - Cả hai cửa sổ Command Prompt (Bước 8 và 9) phải luôn mở
+> - Từ lần sau: chỉ cần mở Laragon → Start All → chạy Bước 8 và 9
+
+---
+
+## Tester Setup Guide (English)
 
 > Steps 1–7 are done **once only**.
 > From next time: open Laragon → Start All → then run Steps 8 and 9 only.
@@ -37,7 +184,7 @@ A web-based management platform for learning centers, supporting three user role
 1. Go to https://nodejs.org/en/download
 2. Click **LTS** version → Download
 3. Run the installer → click **Next** until **Finish**
-4. Verify: open **Command Prompt** → type `node -v` → should show a version number
+4. Verify: open **Command Prompt** → type `node -v` → should show a version number ✓
 
 ---
 
@@ -46,11 +193,13 @@ A web-based management platform for learning centers, supporting three user role
 1. Go to https://git-scm.com/downloads
 2. Click **Download for Windows**
 3. Run the installer → click **Next** until **Finish**
-4. Verify: open **Command Prompt** → type `git --version` → should show a version number
+4. Verify: open **Command Prompt** → type `git --version` → should show a version number ✓
 
 ---
 
 ### Step 3 — Install Laragon
+
+> Laragon includes MySQL inside — **no need to install MySQL separately**.
 
 1. Go to https://laragon.org/download
 2. Click **Download Laragon Full**
@@ -61,7 +210,7 @@ A web-based management platform for learning centers, supporting three user role
 
 ### Step 4 — Start Laragon
 
-1. Open **Laragon** from your Desktop or Start menu
+1. Open **Laragon** from Desktop or Start menu
 2. Click **Start All**
 3. Wait until **MySQL** shows green ✓
 
@@ -204,13 +353,13 @@ Open browser → **http://localhost:5173**
 
 ---
 
-## Login Accounts
+## Login Accounts / Tài khoản đăng nhập
 
-| Role  | Username | Password   |
-|-------|----------|------------|
-| Admin | `admin`  | `admin123` |
-| Staff | `staff`  | `staff123` |
-| Sale  | `sale`   | `sale123`  |
+| Role / Vai trò | Username | Password   |
+|----------------|----------|------------|
+| Admin          | `admin`  | `admin123` |
+| Staff          | `staff`  | `staff123` |
+| Sale           | `sale`   | `sale123`  |
 
 ---
 
@@ -248,27 +397,27 @@ ILCMS/
 
 ---
 
-## Troubleshooting
+## Troubleshooting / Xử lý lỗi
 
-**"mysql is not recognized" in Step 2**
-- Open `C:\laragon\bin\mysql\` and check your folder name
-- Replace `mysql-8.0.30-winx64` in the command with that folder name
+**"The system cannot find the path" ở Bước 6 / Step 6**
+- Mở `C:\laragon\bin\mysql\` → xem tên thư mục bên trong
+- Thay `mysql-8.0.30-winx64` trong lệnh bằng tên thư mục đó
 
-**Step 2 shows errors when importing**
-- Make sure Laragon is running and MySQL is green
-- Try with no password: remove `-pviet` from the command
+**Lỗi khi import database / Error when importing database**
+- Kiểm tra Laragon đang chạy và MySQL đang xanh
+- Thử lại lệnh import
 
-**"npm install" fails**
-- Make sure Node.js is installed: run `node -v` in terminal
-- Delete the `node_modules` folder and run `npm install` again
+**"npm install" thất bại / fails**
+- Kiểm tra Node.js đã cài: gõ `node -v` trong terminal
+- Xóa thư mục `node_modules` rồi chạy lại `npm install`
 
-**Login shows "Invalid username or password"**
-- Make sure the database was imported correctly (Step 2)
-- Make sure the backend terminal is still running (port 5000)
+**Đăng nhập báo sai mật khẩu / Login shows "Invalid username or password"**
+- Kiểm tra database đã import đúng chưa (Bước 6)
+- Kiểm tra cửa sổ Backend vẫn đang chạy (port 5000)
 
-**Page shows blank / "Cannot GET /"**
-- Make sure the frontend terminal is running (port 5173)
-- Open `http://localhost:5173` not `http://localhost:5000`
+**Trang trắng / "Cannot GET /"**
+- Kiểm tra cửa sổ Frontend vẫn đang chạy (port 5173)
+- Truy cập `http://localhost:5173` không phải `http://localhost:5000`
 
-**Port already in use**
-- Stop other Node.js processes or restart your computer
+**Cổng đang bị chiếm / Port already in use**
+- Tắt các tiến trình Node.js khác hoặc khởi động lại máy tính
