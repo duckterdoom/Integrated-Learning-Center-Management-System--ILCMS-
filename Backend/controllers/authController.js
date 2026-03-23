@@ -110,7 +110,7 @@ export const refresh = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
 
     const [rows] = await pool.query(
-      `SELECT u.user_id, u.username, u.full_name, u.status,
+      `SELECT u.user_id, u.username, u.full_name, u.status, u.password_changed_at,
               r.role_id, r.role_name
        FROM \`User\` u
        JOIN Role r ON u.role_id = r.role_id
@@ -121,6 +121,16 @@ export const refresh = async (req, res) => {
     if (rows.length === 0 || rows[0].status !== 'Active') {
       res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'Strict' });
       return res.status(403).json({ message: 'Account not found or disabled' });
+    }
+
+    // If password was changed after this token was issued, force re-login
+    const { password_changed_at } = rows[0];
+    if (password_changed_at) {
+      const changedAtSec = Math.floor(new Date(password_changed_at).getTime() / 1000);
+      if (decoded.iat < changedAtSec) {
+        res.clearCookie('refreshToken', { httpOnly: true, sameSite: 'Strict' });
+        return res.status(401).json({ message: 'Password has been changed. Please log in again.' });
+      }
     }
 
     const user = rows[0];

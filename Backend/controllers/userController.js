@@ -33,23 +33,30 @@ export const getUsers = async (req, res) => {
   const offset = (page - 1) * limit;
 
   try {
+    const isNumeric = /^\d+$/.test(search);
     const likeParam = `%${search}%`;
+
+    const whereClause = isNumeric
+      ? 'u.user_id = ?'
+      : '(u.username LIKE ? OR u.full_name LIKE ? OR u.email LIKE ?)';
+    const whereParams = isNumeric
+      ? [parseInt(search, 10)]
+      : [likeParam, likeParam, likeParam];
 
     const [rows] = await pool.query(
       `SELECT u.user_id, u.username, u.full_name, u.email,
               r.role_id, r.role_name, u.status, u.created_at
        FROM \`User\` u
        JOIN Role r ON u.role_id = r.role_id
-       WHERE (u.username LIKE ? OR u.full_name LIKE ? OR u.email LIKE ?)
+       WHERE ${whereClause}
        ORDER BY u.created_at DESC
        LIMIT ? OFFSET ?`,
-      [likeParam, likeParam, likeParam, limit, offset]
+      [...whereParams, limit, offset]
     );
 
     const [[{ total }]] = await pool.query(
-      `SELECT COUNT(*) AS total FROM \`User\` u
-       WHERE (u.username LIKE ? OR u.full_name LIKE ? OR u.email LIKE ?)`,
-      [likeParam, likeParam, likeParam]
+      `SELECT COUNT(*) AS total FROM \`User\` u WHERE ${whereClause}`,
+      whereParams
     );
 
     return res.status(200).json({
@@ -222,7 +229,7 @@ export const resetPassword = async (req, res) => {
     const hashed = await bcrypt.hash(tempPassword, rounds);
 
     await pool.query(
-      'UPDATE `User` SET password = ? WHERE user_id = ?',
+      'UPDATE `User` SET password = ?, password_changed_at = NOW() WHERE user_id = ?',
       [hashed, userId]
     );
 
@@ -268,7 +275,10 @@ export const setPassword = async (req, res) => {
 
     const rounds = parseInt(process.env.BCRYPT_ROUNDS, 10) || 10;
     const hashed = await bcrypt.hash(password.trim(), rounds);
-    await pool.query('UPDATE `User` SET password = ? WHERE user_id = ?', [hashed, userId]);
+    await pool.query(
+      'UPDATE `User` SET password = ?, password_changed_at = NOW() WHERE user_id = ?',
+      [hashed, userId]
+    );
 
     return res.status(200).json({ message: 'Password updated successfully' });
   } catch (err) {

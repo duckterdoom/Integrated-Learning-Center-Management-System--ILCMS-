@@ -7,11 +7,6 @@ import './ManageAccountPage.css';
 const ROLES = ['Staff', 'Sale'];
 const ROLE_ID = { Admin: 1, Staff: 2, Sale: 3 };
 
-function authHeader() {
-  const token = localStorage.getItem('accessToken');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-}
-
 /* ── Role badge ── */
 function RoleBadge({ role }) {
   const cls = role === 'Admin' ? 'admin' : role === 'Sale' ? 'sale' : 'staff';
@@ -188,13 +183,27 @@ export default function ManageAccountPage() {
     navigate('/');
   };
 
-  // Handle 401 — redirect to login
-  const handleApiResponse = (res) => {
+  // Fetch wrapper: auto-refreshes access token on 401, logs out if refresh also fails
+  const apiFetch = async (url, options = {}) => {
+    const withAuth = (token) => fetch(url, {
+      ...options,
+      headers: { ...options.headers, Authorization: `Bearer ${token}` },
+    });
+
+    let res = await withAuth(localStorage.getItem('accessToken') || '');
     if (res.status === 401) {
-      handleLogout();
-      return false;
+      try {
+        const rr = await fetch('/api/auth/refresh', { method: 'POST', credentials: 'include' });
+        if (!rr.ok) { handleLogout(); return res; }
+        const { accessToken } = await rr.json();
+        localStorage.setItem('accessToken', accessToken);
+        res = await withAuth(accessToken);
+        if (res.status === 401) { handleLogout(); }
+      } catch {
+        handleLogout();
+      }
     }
-    return true;
+    return res;
   };
 
   const closeModal = () => { setModal(null); setModalError(''); };
@@ -203,11 +212,8 @@ export default function ManageAccountPage() {
     setLoading(true);
     try {
       const params = new URLSearchParams({ page: currentPage, limit: 10, search: searchTerm });
-      const res  = await fetch(`/api/users?${params}`, {
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
-      });
+      const res  = await apiFetch(`/api/users?${params}`);
       const json = await res.json();
-      if (res.status === 401) { handleLogout(); return; }
       if (!res.ok) return;
       setUsers(json.data);
       setTotalPages(json.pagination?.totalPages || 1);
@@ -227,13 +233,13 @@ export default function ManageAccountPage() {
   const handleAdd = async (data) => {
     setModalError('');
     try {
-      const res  = await fetch('/api/users', {
+      const res  = await apiFetch('/api/users', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
+      if (res.status === 401) return;
       const json = await res.json();
-      if (!handleApiResponse(res)) return;
       if (!res.ok) { setModalError(json.message || 'Failed to create user.'); return; }
       closeModal();
       fetchUsers(search, page);
@@ -245,12 +251,9 @@ export default function ManageAccountPage() {
   const handleDelete = async (userId) => {
     setModalError('');
     try {
-      const res  = await fetch(`/api/users/${userId}`, {
-        method: 'DELETE',
-        headers: { ...authHeader() },
-      });
+      const res  = await apiFetch(`/api/users/${userId}`, { method: 'DELETE' });
+      if (res.status === 401) return;
       const json = await res.json();
-      if (!handleApiResponse(res)) return;
       if (!res.ok) { setModalError(json.message || 'Failed to delete user.'); return; }
       closeModal();
       fetchUsers(search, page);
@@ -262,13 +265,13 @@ export default function ManageAccountPage() {
   const handleSetPassword = async (userId, newPassword) => {
     setModalError('');
     try {
-      const res  = await fetch(`/api/users/${userId}/set-password`, {
+      const res  = await apiFetch(`/api/users/${userId}/set-password`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...authHeader() },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password: newPassword }),
       });
+      if (res.status === 401) return;
       const json = await res.json();
-      if (!handleApiResponse(res)) return;
       if (!res.ok) { setModalError(json.message || 'Failed to update password.'); return; }
       closeModal();
     } catch {

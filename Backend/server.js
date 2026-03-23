@@ -8,6 +8,7 @@ import dotenv from 'dotenv';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import { verifyToken, requireRole } from './middleware/authMiddleware.js';
+import pool from './config/db.js';
 
 dotenv.config();
 
@@ -56,6 +57,18 @@ app.use((err, _req, res, _next) => {
   res.status(500).json({ message: 'An unexpected error occurred' });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
+  try {
+    const [cols] = await pool.query(
+      `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'User' AND COLUMN_NAME = 'password_changed_at'`
+    );
+    if (cols.length === 0) {
+      await pool.query('ALTER TABLE `User` ADD COLUMN password_changed_at DATETIME DEFAULT NULL');
+    }
+    console.log('Database migration: password_changed_at column ready');
+  } catch (err) {
+    console.error('Migration warning:', err.message);
+  }
 });

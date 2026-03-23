@@ -23,14 +23,15 @@ CREATE TABLE IF NOT EXISTS Role (
 -- User  (full_name added per User Story: Admin Manage Account)
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS `User` (
-  user_id    INT           NOT NULL AUTO_INCREMENT,
-  username   VARCHAR(50)   NOT NULL,
-  full_name  VARCHAR(100)  DEFAULT NULL,
-  password   VARCHAR(255)  NOT NULL,
-  email      VARCHAR(100)  NOT NULL,
-  role_id    INT           NOT NULL,
-  status     VARCHAR(20)   NOT NULL DEFAULT 'Active',
-  created_at DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  user_id             INT           NOT NULL AUTO_INCREMENT,
+  username            VARCHAR(50)   NOT NULL,
+  full_name           VARCHAR(100)  DEFAULT NULL,
+  password            VARCHAR(255)  NOT NULL,
+  email               VARCHAR(100)  NOT NULL,
+  role_id             INT           NOT NULL,
+  status              VARCHAR(20)   NOT NULL DEFAULT 'Active',
+  created_at          DATETIME      NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  password_changed_at DATETIME      DEFAULT NULL,
   PRIMARY KEY (user_id),
   UNIQUE KEY uq_username (username),
   UNIQUE KEY uq_email    (email),
@@ -145,6 +146,11 @@ CREATE TABLE IF NOT EXISTS Score (
   KEY idx_score_enrollment (enrollment_id),
   CONSTRAINT fk_score_enrollment FOREIGN KEY (enrollment_id) REFERENCES Enrollment (enrollment_id)
 ) ENGINE=InnoDB;
+
+-- ============================================================
+-- MIGRATION — run once on existing databases
+-- ALTER TABLE `User` ADD COLUMN password_changed_at DATETIME DEFAULT NULL;
+-- ============================================================
 
 -- ============================================================
 -- SEED DATA
