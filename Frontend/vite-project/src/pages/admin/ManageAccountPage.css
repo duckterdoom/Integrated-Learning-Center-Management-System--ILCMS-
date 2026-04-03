@@ -403,3 +403,214 @@
   flex: 1;
   min-width: 140px;
 }
+
+/* ── Notification Bell ── */
+.notif-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-right: 4px;
+}
+
+.notif-bell {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: color 0.15s, background 0.15s;
+}
+
+.notif-bell:hover {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+}
+
+.notif-bell--active {
+  color: #fff;
+  animation: bell-ring 0.6s ease-in-out;
+}
+
+@keyframes bell-ring {
+  0%   { transform: rotate(0); }
+  15%  { transform: rotate(10deg); }
+  30%  { transform: rotate(-10deg); }
+  45%  { transform: rotate(8deg); }
+  60%  { transform: rotate(-6deg); }
+  75%  { transform: rotate(4deg); }
+  100% { transform: rotate(0); }
+}
+
+.notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  background: #cc0000;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 3px;
+  pointer-events: none;
+}
+
+/* ── Notification Dropdown ── */
+.notif-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: 320px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.notif-dropdown-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: #f8f8f8;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.notif-dropdown-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111;
+}
+
+.notif-dropdown-count {
+  font-size: 12px;
+  font-weight: 600;
+  color: #cc0000;
+  background: #ffeaea;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.notif-empty {
+  padding: 20px 16px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+  margin: 0;
+}
+
+.notif-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.12s;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: #fafafa;
+}
+
+.notif-item-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-time {
+  font-size: 11px;
+  color: #888;
+}
+
+.notif-reset-btn {
+  flex-shrink: 0;
+  background: #cc0000;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.notif-reset-btn:hover {
+  background: #a00000;
+}
+
+/* ── Temp Password Box ── */
+.temp-password-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f0f4ff;
+  border: 1.5px solid #1a73e8;
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+.temp-password-text {
+  flex: 1;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: 2px;
+  font-family: monospace;
+  word-break: break-all;
+}
+
+.temp-copy-btn {
+  flex-shrink: 0;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  min-width: 60px;
+}
+
+.temp-copy-btn:hover {
+  background: #1558b0;
+}

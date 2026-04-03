@@ -98,6 +98,12 @@
   color: #bbb;
 }
 
+/* Hide browser's native password reveal button (Edge/Chrome) */
+.login-input::-ms-reveal,
+.login-input::-ms-clear {
+  display: none;
+}
+
 .toggle-password {
   background: none;
   border: none;

@@ -60,6 +60,7 @@ app.use((err, _req, res, _next) => {
 app.listen(PORT, async () => {
   console.log(`Server running on http://localhost:${PORT}`);
   try {
+    // Migration: password_changed_at column
     const [cols] = await pool.query(
       `SELECT COLUMN_NAME FROM information_schema.COLUMNS
        WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'User' AND COLUMN_NAME = 'password_changed_at'`
@@ -68,6 +69,21 @@ app.listen(PORT, async () => {
       await pool.query('ALTER TABLE `User` ADD COLUMN password_changed_at DATETIME DEFAULT NULL');
     }
     console.log('Database migration: password_changed_at column ready');
+
+    // Migration: PasswordResetRequest table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS PasswordResetRequest (
+        request_id   INT         NOT NULL AUTO_INCREMENT,
+        user_id      INT         NOT NULL,
+        status       VARCHAR(20) NOT NULL DEFAULT 'Pending',
+        requested_at DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (request_id),
+        KEY idx_prr_user_id (user_id),
+        KEY idx_prr_status  (status),
+        CONSTRAINT fk_prr_user FOREIGN KEY (user_id) REFERENCES \`User\` (user_id) ON DELETE CASCADE
+      ) ENGINE=InnoDB
+    `);
+    console.log('Database migration: PasswordResetRequest table ready');
   } catch (err) {
     console.error('Migration warning:', err.message);
   }

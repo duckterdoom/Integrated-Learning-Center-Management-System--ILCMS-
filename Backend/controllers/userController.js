@@ -49,7 +49,7 @@ export const getUsers = async (req, res) => {
        FROM \`User\` u
        JOIN Role r ON u.role_id = r.role_id
        WHERE ${whereClause}
-       ORDER BY u.created_at DESC
+       ORDER BY u.user_id ASC
        LIMIT ? OFFSET ?`,
       [...whereParams, limit, offset]
     );
