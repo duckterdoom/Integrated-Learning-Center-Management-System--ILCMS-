@@ -143,6 +143,45 @@ app.listen(PORT, async () => {
       ) ENGINE=InnoDB
     `);
     console.log('Database migration: Class table ready');
+
+    // ── Seed: insert sample data if tables are empty ───────────────────────
+    const [[{ courseCount }]] = await pool.query('SELECT COUNT(*) AS courseCount FROM Course');
+    if (courseCount === 0) {
+      await pool.query(`
+        INSERT INTO Course (course_name, tuition_fee, start_date, end_date, status, description) VALUES
+        ('English for Beginners',      3500000,  '2026-01-10', '2026-06-10', 'Active',         'Foundation English course covering basic grammar, vocabulary, and everyday conversation. Suitable for those starting from scratch.'),
+        ('Advanced Mathematics',       4200000,  '2026-02-01', '2026-08-01', 'Active',         'In-depth mathematics covering calculus, linear algebra, and statistics for university preparation.'),
+        ('Programming Fundamentals',   5000000,  '2026-03-01', '2026-09-01', 'Active',         'Introduction to programming using Python. Covers variables, loops, functions, and basic data structures.'),
+        ('Data Science & AI',          7500000,  '2026-04-15', '2026-10-15', 'Wait for active','Comprehensive course on data analysis, machine learning, and AI fundamentals using Python and real-world datasets.'),
+        ('EOB - English for Business', 4800000,  '2026-03-20', '2026-09-20', 'Active',         'Business English course focusing on professional communication, report writing, and presentation skills.'),
+        ('IELTS Preparation',          6000000,  '2026-05-01', '2026-11-01', 'Wait for active','Intensive IELTS preparation covering all four skills: Listening, Reading, Writing, and Speaking. Target band 6.5+.'),
+        ('Web Development Bootcamp',   8000000,  '2026-06-01', '2026-12-01', 'Wait for active','Full-stack web development with HTML, CSS, JavaScript, React, and Node.js. Includes real project portfolio.'),
+        ('Communication Skills',       3000000,  '2025-09-01', '2026-03-01', 'Finish',         'Practical course to develop interpersonal communication, public speaking, and team collaboration skills.')
+      `);
+      console.log('Database seed: Course sample data inserted');
+    }
+
+    const [[{ classCount }]] = await pool.query('SELECT COUNT(*) AS classCount FROM `Class`');
+    if (classCount === 0) {
+      await pool.query(`
+        INSERT INTO \`Class\` (course_id, class_name, teacher_name, start_date, end_date, capacity, status) VALUES
+        (1, 'ENG-2026-01',  'Nguyen Thi Lan',  '2026-01-10', '2026-04-10', 25, 'Active'),
+        (1, 'ENG-2026-02',  'Tran Van Minh',   '2026-02-15', '2026-05-15', 20, 'Active'),
+        (1, 'ENG-2026-03',  'Le Thi Hoa',      '2026-04-20', '2026-07-20', 30, 'Waiting for Activation'),
+        (2, 'MATH-2026-01', 'Pham Van Duc',    '2026-02-01', '2026-05-01', 20, 'Active'),
+        (2, 'MATH-2026-02', 'Hoang Thi Mai',   '2026-04-10', '2026-07-10', 25, 'Waiting for Activation'),
+        (3, 'PROG-2026-01', 'Nguyen Van Khoa', '2026-03-01', '2026-06-01', 30, 'Active'),
+        (3, 'PROG-2026-02', 'Bui Thi Thu',     '2026-05-01', '2026-08-01', 28, 'Waiting for Activation'),
+        (4, 'DSA-2026-01',  'Vo Minh Tuan',    '2026-05-01', '2026-08-01', 20, 'Waiting for Activation'),
+        (5, 'EOB-2026-01',  'Nguyen Thi Lan',  '2026-03-20', '2026-06-20', 20, 'Active'),
+        (5, 'EOB-2026-02',  'Tran Thi Bich',   '2026-05-10', '2026-08-10', 18, 'Waiting for Activation'),
+        (8, 'COM-2025-01',  'Le Van Phong',    '2025-09-01', '2026-01-01', 30, 'Finish'),
+        (8, 'COM-2025-02',  'Pham Thi Ngoc',   '2025-10-01', '2026-02-01', 25, 'Finish')
+      `);
+      console.log('Database seed: Class sample data inserted');
+    }
+    // ── End seed ───────────────────────────────────────────────────────────
+
   } catch (err) {
     console.error('Migration warning:', err.message);
   }

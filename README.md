@@ -117,14 +117,20 @@ cd C:\ILCMS\Frontend\vite-project
 npm install
 ```
 
-**Import database:**
+**Import database (có sẵn dữ liệu mẫu):**
 ```bash
-cd C:\ILCMS\Backend
-mysql -u root -p < database/ilcms_db.sql
+cd C:\ILCMS
+mysql -u root -p < ilcms_dump.sql
 ```
 Nhập mật khẩu root MySQL khi được hỏi → Enter.
 
 Không có thông báo lỗi = import thành công ✓
+
+> **Ghi chú:** Nếu bỏ qua bước import, hệ thống vẫn hoạt động bình thường — Backend sẽ tự tạo database và chèn dữ liệu mẫu khi khởi động lần đầu (xem Bước 7).
+> Có **3 cách** để có dữ liệu mẫu:
+> 1. Import `ilcms_dump.sql` như trên (khuyến nghị cho tester)
+> 2. Chạy Backend (`npm run dev`) — tự động tạo và seed dữ liệu
+> 3. Chạy `npm run db:setup` trong thư mục `Backend`
 
 ---
 
@@ -268,14 +274,20 @@ cd C:\ILCMS\Frontend\vite-project
 npm install
 ```
 
-**Import the database:**
+**Import the database (includes sample data):**
 ```bash
-cd C:\ILCMS\Backend
-mysql -u root -p < database/ilcms_db.sql
+cd C:\ILCMS
+mysql -u root -p < ilcms_dump.sql
 ```
 Enter your MySQL root password when prompted → press Enter.
 
 No error messages = database imported successfully ✓
+
+> **Note:** If you skip the import, the system still works — the Backend automatically creates the database and inserts sample data on first startup (see Step 7).
+> There are **3 ways** to get sample data:
+> 1. Import `ilcms_dump.sql` as above (recommended for testers)
+> 2. Run the Backend (`npm run dev`) — auto-creates and seeds data
+> 3. Run `npm run db:setup` inside the `Backend` folder
 
 ---
 
@@ -329,11 +341,11 @@ http://localhost:5173
 
 ## Login Accounts / Tài khoản đăng nhập
 
-| Role / Vai trò | Username | Password   |
-|----------------|----------|------------|
-| Admin          | `admin`  | `admin123` |
-| Staff          | `staff`  | `staff123` |
-| Sale           | `sale`   | `sale123`  |
+| Role / Vai trò | Username | Password  |
+|----------------|----------|-----------|
+| Admin          | `admin`  | `admin`   |
+| Staff          | `staff`  | `staff`   |
+| Sale           | `sale`   | `sale`    |
 
 ---
 
@@ -341,19 +353,20 @@ http://localhost:5173
 
 ```
 ILCMS/
+├── ilcms_dump.sql                  ← ✅ Full database dump with sample data (import this)
+│
 ├── Backend/                        ← Node.js + Express API
 │   ├── config/
 │   │   └── db.js                   ← MySQL connection pool
-│   ├── controllers/                ← Business logic (auth, users)
+│   ├── controllers/                ← Business logic (auth, users, courses, classes)
 │   ├── database/
-│   │   ├── ilcms_db.sql            ← ✅ Full database export (import this)
-│   │   ├── export.js               ← Re-export database anytime
-│   │   ├── setup.js                ← Dev only: creates DB + tables
-│   │   └── seed.js                 ← Dev only: seeds Admin account
+│   │   ├── export.js               ← Re-export database anytime: npm run db:export
+│   │   ├── setup.js                ← One-time setup: creates DB + tables + seeds all data
+│   │   └── seed.js                 ← Seeds Admin account only
 │   ├── middleware/                 ← JWT auth, request validation
 │   ├── routes/                     ← API route definitions
 │   ├── .env                        ← Environment config (set DB_PASSWORD)
-│   └── server.js                   ← App entry point
+│   └── server.js                   ← App entry point (auto-seeds data on first run)
 │
 └── Frontend/
     └── vite-project/               ← React + Vite app
@@ -362,8 +375,8 @@ ILCMS/
             ├── assets/             ← Logo images
             └── pages/
                 ├── auth/           ← LoginPage (with Forgot Password)
-                ├── admin/          ← AdminHomePage, ManageAccountPage
-                ├── staff/          ← StaffHomePage
+                ├── admin/          ← AdminHomePage, ManageAccountPage, ManageClassPage
+                ├── staff/          ← StaffHomePage, ManageClassPage, ManageCoursePage
                 └── saler/          ← SalerHomePage
 ```
 
