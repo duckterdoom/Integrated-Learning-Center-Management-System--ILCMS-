@@ -4,6 +4,9 @@ import AdminHomePage from './pages/admin/AdminHomePage';
 import StaffHomePage from './pages/staff/StaffHomePage';
 import SalerHomePage from './pages/saler/SalerHomePage';
 import ManageAccountPage from './pages/admin/ManageAccountPage';
+import ManageClassPage from './pages/staff/ManageClassPage';
+import ManageCoursePage from './pages/staff/ManageCoursePage';
+import AdminManageClassPage from './pages/admin/AdminManageClassPage';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -58,10 +61,34 @@ function App() {
           }
         />
         <Route
+          path="/admin/manage-class"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <AdminManageClassPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/staff"
           element={
             <ProtectedRoute allowedRoles={['Staff']}>
               <StaffHomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-class"
+          element={
+            <ProtectedRoute allowedRoles={['Staff']}>
+              <ManageClassPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/staff/manage-course"
+          element={
+            <ProtectedRoute allowedRoles={['Staff']}>
+              <ManageCoursePage />
             </ProtectedRoute>
           }
         />

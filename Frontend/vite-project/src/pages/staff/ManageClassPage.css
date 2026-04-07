@@ -1,0 +1,464 @@
+/* ── Reuse sidebar/layout from StaffHomePage.css ── */
+
+/* ── Page header bar ── */
+.mc-topbar {
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+.mc-topbar-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  margin: 0;
+}
+
+/* ── Breadcrumb ── */
+.mc-breadcrumb {
+  padding: 8px 24px;
+  font-size: 14px;
+  color: #555;
+  background: #fff;
+  border-bottom: 1px solid #ddd;
+  flex-shrink: 0;
+}
+
+/* ── Content area ── */
+.mc-content {
+  padding: 20px 24px;
+  flex: 1;
+  position: relative;
+}
+
+.mc-content::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: url('/ismart-favicon.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 340px;
+  opacity: 0.06;
+  pointer-events: none;
+}
+
+/* ── Class list card ── */
+.mc-card {
+  background: #fff;
+  border: 2px solid #1a3a5c;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.mc-card-header {
+  background: #1a3a5c;
+  color: #fff;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mc-card-header-left {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.mc-card-header svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mc-add-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 7px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s;
+}
+
+.mc-add-btn:hover {
+  background: #218838;
+}
+
+/* ── Table ── */
+.mc-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.mc-table th {
+  background: #f0f4f8;
+  padding: 11px 14px;
+  text-align: center;
+  border-bottom: 2px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-weight: 700;
+  color: #1a3a5c;
+  white-space: nowrap;
+}
+
+.mc-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee;
+  color: #333;
+}
+
+.mc-table tr:hover td {
+  background: #f9fbff;
+}
+
+.mc-table td:first-child,
+.mc-table th:first-child {
+  text-align: center;
+  width: 50px;
+}
+
+/* ── Status badges ── */
+.mc-status {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mc-status--waiting {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.mc-status--active {
+  background: #d4edda;
+  color: #155724;
+}
+
+.mc-status--finish {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+/* ── Action buttons in table ── */
+.mc-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.mc-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  transition: background 0.15s;
+}
+
+.mc-action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mc-action-btn--info {
+  color: #1a73e8;
+}
+.mc-action-btn--info:hover {
+  background: #e8f0fe;
+}
+
+.mc-action-btn--edit {
+  color: #f59e0b;
+}
+.mc-action-btn--edit:hover {
+  background: #fffbeb;
+}
+
+.mc-action-btn--delete {
+  color: #dc3545;
+}
+.mc-action-btn--delete:hover {
+  background: #fdf2f2;
+}
+
+/* ── Empty state ── */
+.mc-empty {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}
+
+/* ── Modal overlay ── */
+.mc-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mc-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 540px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.mc-modal--sm {
+  max-width: 400px;
+}
+
+.mc-modal-header {
+  background: #1a3a5c;
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.mc-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.mc-modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.mc-modal-close:hover {
+  opacity: 1;
+}
+
+.mc-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.mc-modal-footer {
+  padding: 14px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* ── Form fields ── */
+.mc-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.mc-form-row--full {
+  grid-template-columns: 1fr;
+}
+
+.mc-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mc-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.mc-form-group label span {
+  color: #dc3545;
+  margin-left: 2px;
+}
+
+.mc-form-group input,
+.mc-form-group select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  transition: border-color 0.15s;
+  background: #fff;
+}
+
+.mc-form-group input:focus,
+.mc-form-group select:focus {
+  border-color: #1a3a5c;
+  box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.12);
+}
+
+.mc-form-group input:read-only {
+  background: #f8f9fa;
+  color: #555;
+  cursor: default;
+}
+
+.mc-form-group input:read-only:focus {
+  border-color: #ccc;
+  box-shadow: none;
+}
+
+/* ── Info grid (read-only view) ── */
+.mc-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.mc-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.mc-info-item--full {
+  grid-column: 1 / -1;
+}
+
+.mc-info-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.mc-info-value {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+  padding: 7px 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  min-height: 34px;
+}
+
+/* ── Buttons ── */
+.mc-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 9px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mc-btn--primary {
+  background: #1a3a5c;
+  color: #fff;
+}
+.mc-btn--primary:hover {
+  background: #122b47;
+}
+
+.mc-btn--save {
+  background: #28a745;
+  color: #fff;
+}
+.mc-btn--save:hover {
+  background: #218838;
+}
+
+.mc-btn--danger {
+  background: #dc3545;
+  color: #fff;
+}
+.mc-btn--danger:hover {
+  background: #b02a37;
+}
+
+.mc-btn--cancel {
+  background: #fff;
+  color: #333;
+  border: 2px solid #ccc;
+}
+.mc-btn--cancel:hover {
+  border-color: #999;
+}
+
+.mc-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Error message ── */
+.mc-error {
+  background: #fdf2f2;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  color: #721c24;
+  font-size: 13px;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+}
+
+/* ── Delete confirm ── */
+.mc-delete-msg {
+  font-size: 14px;
+  color: #333;
+  text-align: center;
+  line-height: 1.6;
+}
+
+.mc-delete-msg strong {
+  color: #1a3a5c;
+}
+
+/* ── Loading spinner row ── */
+.mc-loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}

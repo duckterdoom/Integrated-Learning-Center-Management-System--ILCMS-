@@ -7,6 +7,8 @@ import dotenv from 'dotenv';
 
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
+import courseRoutes from './routes/courses.js';
+import classRoutes from './routes/classes.js';
 import { verifyToken, requireRole } from './middleware/authMiddleware.js';
 import pool from './config/db.js';
 
@@ -46,6 +48,10 @@ app.use('/api/auth', authRoutes);
 // Admin-only user management — protected by JWT + role check
 app.use('/api/users', verifyToken, requireRole(['Admin']), userRoutes);
 
+// Course & Class management — Admin + Staff
+app.use('/api/courses', verifyToken, requireRole(['Admin', 'Staff']), courseRoutes);
+app.use('/api/classes', verifyToken, requireRole(['Admin', 'Staff']), classRoutes);
+
 // Health check
 app.get('/', (_req, res) => {
   res.json({ message: 'ILCMS API is running' });
@@ -84,6 +90,59 @@ app.listen(PORT, async () => {
       ) ENGINE=InnoDB
     `);
     console.log('Database migration: PasswordResetRequest table ready');
+
+    // Migration: Course table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS Course (
+        course_id   INT          NOT NULL AUTO_INCREMENT,
+        course_name VARCHAR(150) NOT NULL,
+        description VARCHAR(500) DEFAULT NULL,
+        created_at  DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (course_id),
+        UNIQUE KEY uq_course_name (course_name)
+      ) ENGINE=InnoDB
+    `);
+    console.log('Database migration: Course table ready');
+
+    // Migration: Course — add new columns if missing
+    const courseColsToAdd = [
+      { name: 'tuition_fee', ddl: 'DECIMAL(15,2) DEFAULT NULL' },
+      { name: 'start_date',  ddl: 'DATE DEFAULT NULL' },
+      { name: 'end_date',    ddl: 'DATE DEFAULT NULL' },
+      { name: 'status',      ddl: "VARCHAR(30) NOT NULL DEFAULT 'Wait for active'" },
+    ];
+    for (const col of courseColsToAdd) {
+      const [colCheck] = await pool.query(
+        `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Course' AND COLUMN_NAME = ?`,
+        [col.name]
+      );
+      if (colCheck.length === 0) {
+        await pool.query(`ALTER TABLE Course ADD COLUMN ${col.name} ${col.ddl}`);
+        console.log(`Database migration: Course.${col.name} column added`);
+      }
+    }
+
+    // Migration: Class table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS \`Class\` (
+        class_id     INT          NOT NULL AUTO_INCREMENT,
+        course_id    INT          NOT NULL,
+        class_name   VARCHAR(150) NOT NULL,
+        teacher_name VARCHAR(100) NOT NULL,
+        start_date   DATE         NOT NULL,
+        end_date     DATE         DEFAULT NULL,
+        capacity     INT          NOT NULL DEFAULT 30,
+        status       VARCHAR(30)  NOT NULL DEFAULT 'Waiting for Activation',
+        created_by   INT          DEFAULT NULL,
+        created_at   DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (class_id),
+        KEY idx_class_course (course_id),
+        CONSTRAINT fk_class_course FOREIGN KEY (course_id) REFERENCES Course (course_id),
+        CONSTRAINT fk_class_creator FOREIGN KEY (created_by) REFERENCES \`User\` (user_id) ON DELETE SET NULL
+      ) ENGINE=InnoDB
+    `);
+    console.log('Database migration: Class table ready');
   } catch (err) {
     console.error('Migration warning:', err.message);
   }

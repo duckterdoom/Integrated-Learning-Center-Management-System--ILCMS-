@@ -404,6 +404,60 @@
   min-width: 140px;
 }
 
+/* ── Change Password inline section (inside InfoModal) ── */
+.ma-change-pw-section {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.ma-change-pw-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 10px;
+}
+
+.ma-change-pw-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ma-change-pw-input {
+  flex: 1;
+}
+
+.ma-change-pw-btn {
+  flex-shrink: 0;
+  background: #1a73e8;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.ma-change-pw-btn:hover {
+  background: #1558b0;
+}
+
+.ma-change-pw-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.ma-pw-success {
+  color: #28a745;
+  font-size: 13px;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
+
 /* ── Notification Bell ── */
 .notif-wrap {
   position: relative;

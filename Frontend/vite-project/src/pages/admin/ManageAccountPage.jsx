@@ -76,7 +76,44 @@ function AddModal({ onClose, onSubmit, apiError }) {
 }
 
 /* ── Info Modal ── */
-function InfoModal({ account, onClose, onUpdate, onRemove }) {
+function InfoModal({ account, onClose, onUpdate, onRemove, onPasswordSaved }) {
+  const [newPassword, setNewPassword] = useState('');
+  const [pwError,     setPwError]     = useState('');
+  const [pwSuccess,   setPwSuccess]   = useState('');
+  const [pwSaving,    setPwSaving]    = useState(false);
+
+  const apiFetch = async (url, options = {}) => {
+    const token = localStorage.getItem('accessToken');
+    return fetch(url, {
+      ...options,
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(options.headers || {}) },
+    });
+  };
+
+  const handleChangePassword = async () => {
+    setPwError(''); setPwSuccess('');
+    if (!newPassword.trim() || newPassword.trim().length < 6) {
+      setPwError('Password must be at least 6 characters.');
+      return;
+    }
+    setPwSaving(true);
+    try {
+      const res  = await apiFetch(`/api/users/${account.user_id}/set-password`, {
+        method: 'PUT',
+        body: JSON.stringify({ password: newPassword.trim() }),
+      });
+      const json = await res.json();
+      if (!res.ok) { setPwError(json.message || 'Failed to update password.'); setPwSaving(false); return; }
+      setNewPassword('');
+      setPwSuccess('Password changed successfully.');
+      if (onPasswordSaved) onPasswordSaved();
+    } catch {
+      setPwError('Network error. Please try again.');
+    } finally {
+      setPwSaving(false);
+    }
+  };
+
   return (
     <div className="ma-modal-overlay" onClick={onClose}>
       <div className="ma-modal" onClick={(e) => e.stopPropagation()}>
@@ -84,6 +121,7 @@ function InfoModal({ account, onClose, onUpdate, onRemove }) {
           <h2 className="ma-modal-title" style={{ margin: 0 }}>Information : {account.username}</h2>
           <RoleBadge role={account.role_name} />
         </div>
+
         <div className="ma-info-field">
           <p className="ma-info-label">Username:</p>
           <p className="ma-info-value">{account.username}</p>
@@ -96,7 +134,31 @@ function InfoModal({ account, onClose, onUpdate, onRemove }) {
           <p className="ma-info-label">Email:</p>
           <p className="ma-info-value">{account.email || '—'}</p>
         </div>
-        <div className="ma-modal-actions" style={{ marginTop: '2rem' }}>
+
+        {/* ── Change Password section ── */}
+        <div className="ma-change-pw-section">
+          <p className="ma-change-pw-title">Change Password</p>
+          <div className="ma-change-pw-row">
+            <input
+              className="ma-input ma-change-pw-input"
+              type="password"
+              placeholder="Enter new password"
+              value={newPassword}
+              onChange={(e) => { setNewPassword(e.target.value); setPwError(''); setPwSuccess(''); }}
+            />
+            <button
+              className="ma-change-pw-btn"
+              onClick={handleChangePassword}
+              disabled={pwSaving}
+            >
+              {pwSaving ? 'Saving…' : 'Save'}
+            </button>
+          </div>
+          {pwError   && <p className="ma-error" style={{ marginTop: 6 }}>{pwError}</p>}
+          {pwSuccess && <p className="ma-pw-success">{pwSuccess}</p>}
+        </div>
+
+        <div className="ma-modal-actions" style={{ marginTop: '1.5rem' }}>
           <button className="ma-btn-submit" onClick={onUpdate}>Update</button>
           <button className="ma-btn-remove" onClick={onRemove}>Remove</button>
           <button className="ma-btn-cancel" onClick={onClose}>Cancel</button>
@@ -122,37 +184,52 @@ function ConfirmDeleteModal({ onConfirm, onClose, apiError }) {
   );
 }
 
-/* ── Change Password Modal ── */
-function ChangePasswordModal({ account, onClose, onSubmit, apiError }) {
-  const [password, setPassword] = useState('');
+/* ── Edit Modal (Picture A) ── */
+function EditModal({ account, onClose, onSubmit, apiError }) {
+  const [form, setForm] = useState({
+    full_name: account.full_name || '',
+    email:     account.email     || '',
+    role:      account.role_name || '',
+  });
   const [formError, setFormError] = useState('');
+
+  const set = (field) => (e) => { setForm((f) => ({ ...f, [field]: e.target.value })); setFormError(''); };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!password.trim() || password.trim().length < 6) {
-      setFormError('Password must be at least 6 characters.');
-      return;
-    }
-    onSubmit(password.trim());
+    if (!form.role) { setFormError('Please select a role.'); return; }
+    onSubmit({
+      full_name: form.full_name.trim() || account.username,
+      email:     form.email.trim()     || account.email,
+      role_id:   ROLE_ID[form.role],
+    });
   };
 
   return (
     <div className="ma-modal-overlay" onClick={onClose}>
       <div className="ma-modal" onClick={(e) => e.stopPropagation()}>
-        <h2 className="ma-modal-title">Change Password</h2>
-        <p style={{ color: '#555', marginBottom: '1.5rem', fontSize: '15px' }}>
-          Account: <strong>{account.username}</strong>
-        </p>
+        <h2 className="ma-modal-title">Edit user</h2>
         <form onSubmit={handleSubmit}>
           <div className="ma-field">
-            <label className="ma-label">New Password</label>
-            <input
-              className="ma-input"
-              type="password"
-              value={password}
-              onChange={(e) => { setPassword(e.target.value); setFormError(''); }}
-              autoFocus
-            />
+            <label className="ma-label">Username</label>
+            <input className="ma-input" type="text" value={account.username} readOnly style={{ opacity: 0.6, cursor: 'not-allowed' }} />
+          </div>
+          <div className="ma-field">
+            <label className="ma-label">Full Name</label>
+            <input className="ma-input" type="text" value={form.full_name} onChange={set('full_name')} autoFocus />
+          </div>
+          <div className="ma-field">
+            <label className="ma-label">Email</label>
+            <input className="ma-input" type="email" value={form.email} onChange={set('email')} />
+          </div>
+          <div className="ma-field">
+            <label className="ma-label">Role</label>
+            <div className="ma-select-wrapper">
+              <select className="ma-select" value={form.role} onChange={set('role')}>
+                <option value="">Select role</option>
+                {ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
           </div>
           {(formError || apiError) && <p className="ma-error">{formError || apiError}</p>}
           <div className="ma-modal-actions">
@@ -261,18 +338,19 @@ export default function ManageAccountPage() {
     }
   };
 
-  const handleSetPassword = async (userId, newPassword) => {
+  const handleUpdateUser = async (userId, data) => {
     setModalError('');
     try {
-      const res  = await apiFetch(`/api/users/${userId}/set-password`, {
+      const res  = await apiFetch(`/api/users/${userId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password: newPassword }),
+        body: JSON.stringify(data),
       });
       if (res.status === 401) return;
       const json = await res.json();
-      if (!res.ok) { setModalError(json.message || 'Failed to update password.'); return; }
+      if (!res.ok) { setModalError(json.message || 'Failed to update user.'); return; }
       closeModal();
+      fetchUsers(search, page);
     } catch {
       setModalError('Network error. Is the backend running?');
     }
@@ -385,8 +463,18 @@ export default function ManageAccountPage() {
         <InfoModal
           account={modal.account}
           onClose={closeModal}
-          onUpdate={() => { setModalError(''); setModal({ mode: 'changePassword', account: modal.account }); }}
+          onUpdate={() => { setModalError(''); setModal({ mode: 'edit', account: modal.account }); }}
           onRemove={() => { setModalError(''); setModal({ mode: 'confirmDelete', account: modal.account }); }}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {modal?.mode === 'edit' && (
+        <EditModal
+          account={modal.account}
+          apiError={modalError}
+          onClose={closeModal}
+          onSubmit={(data) => handleUpdateUser(modal.account.user_id, data)}
         />
       )}
 
@@ -396,16 +484,6 @@ export default function ManageAccountPage() {
           apiError={modalError}
           onClose={closeModal}
           onConfirm={() => handleDelete(modal.account.user_id)}
-        />
-      )}
-
-      {/* Change Password Modal */}
-      {modal?.mode === 'changePassword' && (
-        <ChangePasswordModal
-          account={modal.account}
-          apiError={modalError}
-          onClose={closeModal}
-          onSubmit={(newPassword) => handleSetPassword(modal.account.user_id, newPassword)}
         />
       )}
     </div>

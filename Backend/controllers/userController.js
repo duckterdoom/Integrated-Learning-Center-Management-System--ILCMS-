@@ -121,13 +121,14 @@ export const updateUser = async (req, res) => {
   if (!errors.isEmpty()) return validationFail(res, errors);
 
   const userId = parseInt(req.params.id, 10);
-  const { full_name, role_id, status } = req.body;
+  const { full_name, email, role_id, status } = req.body;
 
   // Build dynamic SET clause from provided fields only
   const fields = [];
   const values = [];
 
   if (full_name !== undefined) { fields.push('full_name = ?'); values.push(full_name); }
+  if (email     !== undefined) { fields.push('email = ?');     values.push(email);     }
   if (role_id   !== undefined) { fields.push('role_id = ?');   values.push(role_id);   }
   if (status    !== undefined) { fields.push('status = ?');    values.push(status);    }
 
