@@ -236,3 +236,31 @@ export const validateClassId = [
   param('id')
     .isInt({ min: 1 }).withMessage('Invalid class ID'),
 ];
+
+// ── Material management ────────────────────────────────────────────────────
+
+export const validateCreateMaterial = [
+  body('title')
+    .trim()
+    .notEmpty().withMessage('Material title is required')
+    .isLength({ min: 1, max: 200 }).withMessage('Title must be 1–200 characters'),
+
+  body('course_id')
+    .notEmpty().withMessage('Course is required')
+    .isInt({ min: 1 }).withMessage('Invalid course'),
+];
+
+export const validateUpdateMaterial = [
+  param('id')
+    .isInt({ min: 1 }).withMessage('Invalid material ID'),
+
+  body('title')
+    .trim()
+    .notEmpty().withMessage('Material title is required')
+    .isLength({ min: 1, max: 200 }).withMessage('Title must be 1–200 characters'),
+];
+
+export const validateMaterialId = [
+  param('id')
+    .isInt({ min: 1 }).withMessage('Invalid material ID'),
+];

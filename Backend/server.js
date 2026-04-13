@@ -4,13 +4,18 @@ import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/users.js';
 import courseRoutes from './routes/courses.js';
 import classRoutes from './routes/classes.js';
+import materialRoutes from './routes/materials.js';
 import { verifyToken, requireRole } from './middleware/authMiddleware.js';
 import pool from './config/db.js';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 dotenv.config();
 
@@ -32,6 +37,9 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
+// ── Static files — uploaded materials ─────────────────────────────────────
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // ── Rate limiting — login endpoint only ───────────────────────────────────
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -51,6 +59,7 @@ app.use('/api/users', verifyToken, requireRole(['Admin']), userRoutes);
 // Course & Class management — Admin + Staff
 app.use('/api/courses', verifyToken, requireRole(['Admin', 'Staff']), courseRoutes);
 app.use('/api/classes', verifyToken, requireRole(['Admin', 'Staff']), classRoutes);
+app.use('/api/materials', verifyToken, requireRole(['Admin', 'Staff']), materialRoutes);
 
 // Health check
 app.get('/', (_req, res) => {
@@ -143,6 +152,27 @@ app.listen(PORT, async () => {
       ) ENGINE=InnoDB
     `);
     console.log('Database migration: Class table ready');
+
+    // Migration: Material table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS Material (
+        material_id   INT          NOT NULL AUTO_INCREMENT,
+        course_id     INT          NOT NULL,
+        title         VARCHAR(200) NOT NULL,
+        file_url      VARCHAR(500) DEFAULT NULL,
+        link_url      VARCHAR(500) DEFAULT NULL,
+        file_name     VARCHAR(255) DEFAULT NULL,
+        file_size     BIGINT       DEFAULT NULL,
+        created_by    INT          DEFAULT NULL,
+        created_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at    DATETIME     NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (material_id),
+        KEY idx_material_course (course_id),
+        CONSTRAINT fk_material_course  FOREIGN KEY (course_id)  REFERENCES Course (\`course_id\`) ON DELETE CASCADE,
+        CONSTRAINT fk_material_creator FOREIGN KEY (created_by) REFERENCES \`User\` (user_id)    ON DELETE SET NULL
+      ) ENGINE=InnoDB
+    `);
+    console.log('Database migration: Material table ready');
 
     // ── Seed: insert sample data if tables are empty ───────────────────────
     const [[{ courseCount }]] = await pool.query('SELECT COUNT(*) AS courseCount FROM Course');

@@ -420,3 +420,411 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Material modals  (mat- prefix)
+══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.mat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.mat-overlay--sub {
+  z-index: 1100;
+}
+
+/* ── Base modal ── */
+.mat-modal {
+  background: #fff;
+  border-radius: 12px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.mat-modal--list {
+  max-width: 560px;
+  max-height: 80vh;
+}
+
+.mat-modal--form {
+  max-width: 460px;
+  padding: 32px 32px 24px;
+}
+
+.mat-modal--info {
+  max-width: 420px;
+  padding: 20px 32px 28px;
+}
+
+.mat-modal--confirm {
+  max-width: 420px;
+  padding: 44px 32px 36px;
+  text-align: center;
+}
+
+/* ── List modal header ── */
+.mat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+.mat-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 2px;
+}
+
+.mat-course-name {
+  font-size: 13px;
+  color: #555;
+  margin: 0;
+}
+
+.mat-close {
+  background: none;
+  border: none;
+  font-size: 26px;
+  color: #555;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+  margin-top: -2px;
+}
+
+.mat-close:hover { color: #111; }
+
+/* ── List modal body ── */
+.mat-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 80px;
+}
+
+/* ── Material table ── */
+.mat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.mat-table thead {
+  background: #1a3a5c;
+  color: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.mat-table th {
+  padding: 10px 16px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.mat-th-num,
+.mat-td-num {
+  width: 44px;
+  text-align: center;
+}
+
+.mat-th-action,
+.mat-td-action {
+  width: 64px;
+  text-align: center;
+}
+
+.mat-table tbody tr:nth-child(even) { background: #f8f9fb; }
+.mat-table tbody tr:hover           { background: #eef2f7; }
+
+.mat-table td {
+  padding: 10px 16px;
+  border-bottom: 1px solid #eee;
+}
+
+/* ── Info icon button ── */
+.mat-icon-btn {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #1a3a5c;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: background 0.15s;
+  line-height: 1;
+}
+
+.mat-icon-btn:hover { background: #e8edf3; }
+
+/* ── State messages ── */
+.mat-state {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}
+
+.mat-state--error {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+/* ── Footer ── */
+.mat-footer {
+  padding: 14px 20px;
+  border-top: 1px solid #eee;
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.mat-add-btn {
+  background: #1a3a5c;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.mat-add-btn:hover { background: #122b47; }
+
+/* ── Modal title (form / info) ── */
+.mat-modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 20px;
+}
+
+/* ── Info modal close row ── */
+.mat-info-close-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 4px;
+}
+
+.mat-info-close {
+  background: none;
+  border: none;
+  font-size: 22px;
+  color: #555;
+  cursor: pointer;
+  padding: 0 4px;
+  line-height: 1;
+}
+
+.mat-info-close:hover { color: #111; }
+
+/* ── Info rows ── */
+.mat-info-row {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.mat-info-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  margin-bottom: 2px;
+}
+
+.mat-info-value {
+  font-size: 14px;
+  color: #333;
+  word-break: break-all;
+}
+
+.mat-info-value a {
+  color: #1a73e8;
+  text-decoration: none;
+}
+
+.mat-info-value a:hover { text-decoration: underline; }
+
+/* ── Info actions ── */
+.mat-info-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+
+/* ── Form groups ── */
+.mat-form-group {
+  margin-bottom: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.mat-form-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+}
+
+.mat-form-input {
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 10px 12px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  background: #f5f5f5;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.mat-form-input:focus {
+  border-color: #1a3a5c;
+  background: #fff;
+  box-shadow: 0 0 0 2px rgba(26, 58, 92, 0.1);
+}
+
+.mat-form-input:read-only {
+  opacity: 0.7;
+  cursor: default;
+}
+
+/* ── File upload area ── */
+.mat-upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  background: #fafafa;
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mat-upload-area:hover {
+  border-color: #1a3a5c;
+  background: #f0f4f8;
+}
+
+.mat-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #888;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.mat-upload-placeholder svg { color: #aaa; }
+
+.mat-upload-hint {
+  font-size: 11px;
+  color: #bbb;
+}
+
+.mat-upload-filename {
+  font-size: 13px;
+  color: #1a3a5c;
+  font-weight: 600;
+  word-break: break-all;
+  padding: 0 8px;
+}
+
+/* ── Form error ── */
+.mat-form-error {
+  background: #fdf2f2;
+  border: 1px solid #f5c6cb;
+  border-radius: 6px;
+  color: #721c24;
+  font-size: 13px;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+}
+
+/* ── Form actions ── */
+.mat-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* ── Buttons ── */
+.mat-btn {
+  border: none;
+  border-radius: 6px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  flex: 1;
+}
+
+.mat-btn--primary {
+  background: #1a3a5c;
+  color: #fff;
+}
+
+.mat-btn--primary:hover { background: #122b47; }
+
+.mat-btn--outline {
+  background: #fff;
+  color: #333;
+  border: 2px solid #ccc;
+}
+
+.mat-btn--outline:hover { border-color: #999; }
+
+.mat-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Confirm modal ── */
+.mat-confirm-msg {
+  font-size: 17px;
+  font-weight: 600;
+  color: #111;
+  margin: 0 0 28px;
+  line-height: 1.5;
+}
+
+.mat-confirm-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+/* ── Clickable course card ── */
+.mcp-card--clickable {
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.mcp-card--clickable:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}

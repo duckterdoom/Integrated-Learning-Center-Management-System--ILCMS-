@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ismartLogo from '../../assets/ismart-logo.png';
 import './StaffHomePage.css';
@@ -6,6 +6,7 @@ import './ManageCoursePage.css';
 
 const BASE = 'http://localhost:5000';
 
+// ── API helpers ────────────────────────────────────────────────────────────
 async function apiFetch(path, options = {}) {
   const token = localStorage.getItem('accessToken');
   const res = await fetch(`${BASE}${path}`, {
@@ -40,6 +41,40 @@ async function apiFetch(path, options = {}) {
   return res;
 }
 
+// For multipart/form-data uploads — no Content-Type header (browser sets boundary)
+async function apiFetchFile(path, options = {}) {
+  const token = localStorage.getItem('accessToken');
+  const res = await fetch(`${BASE}${path}`, {
+    ...options,
+    credentials: 'include',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(options.headers || {}),
+    },
+  });
+  if (res.status === 401) {
+    const refresh = await fetch(`${BASE}/api/auth/refresh`, { method: 'POST', credentials: 'include' });
+    if (refresh.ok) {
+      const data = await refresh.json();
+      localStorage.setItem('accessToken', data.accessToken);
+      return fetch(`${BASE}${path}`, {
+        ...options,
+        credentials: 'include',
+        headers: {
+          Authorization: `Bearer ${data.accessToken}`,
+          ...(options.headers || {}),
+        },
+      });
+    } else {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    }
+  }
+  return res;
+}
+
+// ── Utility helpers ────────────────────────────────────────────────────────
 function fmt(dateStr) {
   if (!dateStr) return 'xx/xx/xxx';
   const d = dateStr.slice(0, 10).split('-');
@@ -49,6 +84,13 @@ function fmt(dateStr) {
 function fmtFee(val) {
   if (!val && val !== 0) return '—';
   return Number(val).toLocaleString('vi-VN');
+}
+
+function formatFileSize(bytes) {
+  if (!bytes) return '—';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 // Card gradient colors cycling by index
@@ -72,7 +114,10 @@ function StatusBadge({ status }) {
   return <span className="mcp-status mcp-status--waiting">{status || 'Wait for active'}</span>;
 }
 
-// ── Form (Add / Edit) ──────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// Course modals
+// ══════════════════════════════════════════════════════════════════════════
+
 const EMPTY_FORM = {
   course_name: '',
   tuition_fee: '',
@@ -198,7 +243,6 @@ function CourseForm({ initial, onSave, onCancel, isEdit }) {
   );
 }
 
-// ── Info modal ─────────────────────────────────────────────────────────────
 function InfoModal({ course, onClose, onEdit, onDelete }) {
   return (
     <div className="mcp-modal-overlay" onClick={onClose}>
@@ -243,7 +287,6 @@ function InfoModal({ course, onClose, onEdit, onDelete }) {
   );
 }
 
-// ── Delete confirm ─────────────────────────────────────────────────────────
 function DeleteModal({ course, onConfirm, onCancel }) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
@@ -282,14 +325,348 @@ function DeleteModal({ course, onConfirm, onCancel }) {
   );
 }
 
-// ── Course card ────────────────────────────────────────────────────────────
-function CourseCard({ course, index, onDots }) {
+// ══════════════════════════════════════════════════════════════════════════
+// Material modals
+// ══════════════════════════════════════════════════════════════════════════
+
+function MaterialForm({ courseId, courseName, initial, onSave, onCancel, isEdit }) {
+  const [title, setTitle]       = useState(initial?.title    || '');
+  const [linkUrl, setLinkUrl]   = useState(initial?.link_url || '');
+  const [file, setFile]         = useState(null);
+  const [fileName, setFileName] = useState(initial?.file_name || '');
+  const [error, setError]       = useState('');
+  const [saving, setSaving]     = useState(false);
+  const fileInputRef            = useRef(null);
+
+  const handleFileChange = e => {
+    const f = e.target.files[0];
+    if (f) { setFile(f); setFileName(f.name); }
+  };
+
+  const handleSubmit = async () => {
+    setError('');
+    if (!title.trim()) { setError('Material title is required.'); return; }
+    if (!isEdit && !file && !linkUrl.trim()) {
+      setError('Please upload a file or provide a link URL.');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append('title', title.trim());
+      formData.append('course_id', courseId);
+      if (file) formData.append('file', file);
+      formData.append('link_url', linkUrl.trim());
+
+      const url    = isEdit ? `/api/materials/${initial.material_id}` : '/api/materials';
+      const method = isEdit ? 'PUT' : 'POST';
+      const res    = await apiFetchFile(url, { method, body: formData });
+      const data   = await res.json();
+      if (!res.ok) { setError(data.message || 'An error occurred.'); setSaving(false); return; }
+      onSave();
+    } catch {
+      setError('Network error. Please try again.');
+      setSaving(false);
+    }
+  };
+
+  return (
+    <div className="mat-overlay mat-overlay--sub" onClick={onCancel}>
+      <div className="mat-modal mat-modal--form" onClick={e => e.stopPropagation()}>
+        <h2 className="mat-modal-title">{isEdit ? 'Update Material' : 'Add Material'}</h2>
+
+        {error && <div className="mat-form-error">{error}</div>}
+
+        <div className="mat-form-group">
+          <label>Title</label>
+          <input
+            className="mat-form-input"
+            placeholder="Enter material title"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+          />
+        </div>
+
+        <div className="mat-form-group">
+          <label>Course</label>
+          <input className="mat-form-input" value={courseName} readOnly />
+        </div>
+
+        <div className="mat-form-group">
+          <label>File {isEdit && fileName ? `(current: ${fileName})` : ''}</label>
+          <div className="mat-upload-area" onClick={() => fileInputRef.current?.click()}>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".pdf,.doc,.docx,.ppt,.pptx"
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+            />
+            {file ? (
+              <span className="mat-upload-filename">{file.name}</span>
+            ) : (
+              <span className="mat-upload-placeholder">
+                <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <polyline points="16 16 12 12 8 16"/>
+                  <line x1="12" y1="12" x2="12" y2="21"/>
+                  <path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
+                </svg>
+                <span>{isEdit ? 'Click to replace file' : 'Click to upload file'}</span>
+                <span className="mat-upload-hint">PDF, DOC, DOCX, PPT, PPTX (max 20 MB)</span>
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="mat-form-group">
+          <label>File URL (link)</label>
+          <input
+            className="mat-form-input"
+            placeholder="https://..."
+            value={linkUrl}
+            onChange={e => setLinkUrl(e.target.value)}
+          />
+        </div>
+
+        <div className="mat-form-actions">
+          <button className="mat-btn mat-btn--primary" onClick={handleSubmit} disabled={saving}>
+            {saving ? 'Saving...' : isEdit ? 'Update' : 'Add'}
+          </button>
+          <button className="mat-btn mat-btn--outline" onClick={onCancel} disabled={saving}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MaterialInfoModal({ material, onClose, onEdit, onDelete }) {
+  return (
+    <div className="mat-overlay mat-overlay--sub" onClick={onClose}>
+      <div className="mat-modal mat-modal--info" onClick={e => e.stopPropagation()}>
+        <div className="mat-info-close-row">
+          <button className="mat-info-close" onClick={onClose}>×</button>
+        </div>
+        <h2 className="mat-modal-title">Information</h2>
+
+        <div className="mat-info-row">
+          <span className="mat-info-label">Title</span>
+          <span className="mat-info-value">{material.title}</span>
+        </div>
+        <div className="mat-info-row">
+          <span className="mat-info-label">File Name</span>
+          <span className="mat-info-value">{material.file_name || '—'}</span>
+        </div>
+        <div className="mat-info-row">
+          <span className="mat-info-label">File Size</span>
+          <span className="mat-info-value">{formatFileSize(material.file_size)}</span>
+        </div>
+        <div className="mat-info-row">
+          <span className="mat-info-label">Link URL</span>
+          <span className="mat-info-value">
+            {material.link_url
+              ? <a href={material.link_url} target="_blank" rel="noopener noreferrer">{material.link_url}</a>
+              : '—'}
+          </span>
+        </div>
+        <div className="mat-info-row">
+          <span className="mat-info-label">Created At</span>
+          <span className="mat-info-value">
+            {material.created_at ? new Date(material.created_at).toLocaleDateString('vi-VN') : '—'}
+          </span>
+        </div>
+
+        <div className="mat-info-actions">
+          <button className="mat-btn mat-btn--primary" onClick={onEdit}>Update</button>
+          <button className="mat-btn mat-btn--primary" onClick={onDelete}>Remove</button>
+          <button className="mat-btn mat-btn--outline" onClick={onClose}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function DeleteMaterialModal({ material, onConfirm, onCancel }) {
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError]       = useState('');
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setError('');
+    try {
+      const res = await apiFetch(`/api/materials/${material.material_id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const d = await res.json();
+        setError(d.message || 'Failed to delete.');
+        setDeleting(false);
+        return;
+      }
+      onConfirm();
+    } catch {
+      setError('Network error. Please try again.');
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <div className="mat-overlay mat-overlay--sub" onClick={onCancel}>
+      <div className="mat-modal mat-modal--confirm" onClick={e => e.stopPropagation()}>
+        {error && <div className="mat-form-error" style={{ marginBottom: 16 }}>{error}</div>}
+        <p className="mat-confirm-msg">Are you sure want to delete this material?</p>
+        <div className="mat-confirm-actions">
+          <button className="mat-btn mat-btn--primary" onClick={handleDelete} disabled={deleting}>
+            {deleting ? 'Deleting...' : 'Yes'}
+          </button>
+          <button className="mat-btn mat-btn--outline" onClick={onCancel} disabled={deleting}>Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MaterialListModal({ course, onClose }) {
+  const [materials, setMaterials]   = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [loadError, setLoadError]   = useState(false);
+  const [matModal, setMatModal]     = useState(null); // null | 'add' | 'info' | 'edit' | 'delete'
+  const [selectedMat, setSelectedMat] = useState(null);
+
+  const loadMaterials = useCallback(async () => {
+    setLoading(true);
+    setLoadError(false);
+    try {
+      const res = await apiFetch(`/api/materials?course_id=${course.course_id}`);
+      if (!res || !res.ok) { setLoadError(true); return; }
+      const data = await res.json();
+      setMaterials(data.data || []);
+    } catch {
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [course.course_id]);
+
+  useEffect(() => { loadMaterials(); }, [loadMaterials]);
+
+  const closeMatModal = () => { setMatModal(null); setSelectedMat(null); };
+  const afterSave     = () => { closeMatModal(); loadMaterials(); };
+
+  return (
+    <>
+      {/* ── Material list overlay ── */}
+      <div className="mat-overlay" onClick={onClose}>
+        <div className="mat-modal mat-modal--list" onClick={e => e.stopPropagation()}>
+
+          <div className="mat-header">
+            <div>
+              <h2 className="mat-title">Material</h2>
+              <p className="mat-course-name">{course.course_name}</p>
+            </div>
+            <button className="mat-close" onClick={onClose}>×</button>
+          </div>
+
+          <div className="mat-body">
+            {loading ? (
+              <div className="mat-state">Loading...</div>
+            ) : loadError ? (
+              <div className="mat-state mat-state--error">Unable to load material data</div>
+            ) : materials.length === 0 ? (
+              <div className="mat-state">No materials available</div>
+            ) : (
+              <table className="mat-table">
+                <thead>
+                  <tr>
+                    <th className="mat-th-num">#</th>
+                    <th>Material Name</th>
+                    <th className="mat-th-action">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {materials.map((m, i) => (
+                    <tr key={m.material_id}>
+                      <td className="mat-td-num">{i + 1}</td>
+                      <td>{m.title}</td>
+                      <td className="mat-td-action">
+                        <button
+                          className="mat-icon-btn"
+                          title="View info"
+                          onClick={() => { setSelectedMat(m); setMatModal('info'); }}
+                        >
+                          ⓘ
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+
+          <div className="mat-footer">
+            <button className="mat-add-btn" onClick={() => setMatModal('add')}>+ Add</button>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Sub-modals (z-index 1100) ── */}
+      {matModal === 'add' && (
+        <MaterialForm
+          courseId={course.course_id}
+          courseName={course.course_name}
+          onSave={afterSave}
+          onCancel={closeMatModal}
+          isEdit={false}
+        />
+      )}
+
+      {matModal === 'info' && selectedMat && (
+        <MaterialInfoModal
+          material={selectedMat}
+          onClose={closeMatModal}
+          onEdit={() => setMatModal('edit')}
+          onDelete={() => setMatModal('delete')}
+        />
+      )}
+
+      {matModal === 'edit' && selectedMat && (
+        <MaterialForm
+          courseId={course.course_id}
+          courseName={course.course_name}
+          initial={selectedMat}
+          onSave={afterSave}
+          onCancel={closeMatModal}
+          isEdit={true}
+        />
+      )}
+
+      {matModal === 'delete' && selectedMat && (
+        <DeleteMaterialModal
+          material={selectedMat}
+          onConfirm={afterSave}
+          onCancel={closeMatModal}
+        />
+      )}
+    </>
+  );
+}
+
+// ══════════════════════════════════════════════════════════════════════════
+// Course card
+// ══════════════════════════════════════════════════════════════════════════
+function CourseCard({ course, index, onDots, onCardClick }) {
   const color = CARD_COLORS[index % CARD_COLORS.length];
   return (
-    <div className="mcp-card">
+    <div
+      className="mcp-card mcp-card--clickable"
+      onClick={() => onCardClick(course)}
+    >
       <div className="mcp-card-thumb" style={{ background: color }}>
         <span className="mcp-card-initials">{getInitials(course.course_name)}</span>
-        <button className="mcp-card-dots" onClick={() => onDots(course)} title="View info">
+        <button
+          className="mcp-card-dots"
+          onClick={e => { e.stopPropagation(); onDots(course); }}
+          title="View info"
+        >
           <span>•••</span>
         </button>
       </div>
@@ -304,21 +681,26 @@ function CourseCard({ course, index, onDots }) {
   );
 }
 
-// ── Main page ──────────────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+// Main page
+// ══════════════════════════════════════════════════════════════════════════
 const PER_PAGE = 10;
 
 export default function ManageCoursePage() {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(false);
-  const [search, setSearch] = useState('');
-  const [page, setPage] = useState(1);
+  const [courses, setCourses]       = useState([]);
+  const [loading, setLoading]       = useState(true);
+  const [loadError, setLoadError]   = useState(false);
+  const [search, setSearch]         = useState('');
+  const [page, setPage]             = useState(1);
 
-  // modal: null | 'add' | 'info' | 'edit' | 'delete'
-  const [modal, setModal] = useState(null);
+  // Course modals: null | 'add' | 'info' | 'edit' | 'delete'
+  const [modal, setModal]     = useState(null);
   const [selected, setSelected] = useState(null);
+
+  // Material list modal
+  const [materialCourse, setMaterialCourse] = useState(null);
 
   const user = (() => {
     try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
@@ -348,31 +730,27 @@ export default function ManageCoursePage() {
   useEffect(() => { loadData(); }, [loadData]);
 
   const closeModal = () => { setModal(null); setSelected(null); };
-  const onSaved = () => { closeModal(); loadData(); };
+  const onSaved    = () => { closeModal(); loadData(); };
 
-  const openDots = course => { setSelected(course); setModal('info'); };
+  const openDots      = course => { setSelected(course); setModal('info'); };
+  const openMaterials = course => setMaterialCourse(course);
 
-  const editInitial = selected
-    ? {
-        course_id:   selected.course_id,
-        course_name: selected.course_name,
-        tuition_fee: selected.tuition_fee != null ? String(selected.tuition_fee) : '',
-        start_date:  selected.start_date ? selected.start_date.slice(0, 10) : '',
-        end_date:    selected.end_date   ? selected.end_date.slice(0, 10)   : '',
-        status:      selected.status || 'Wait for active',
-        description: selected.description || '',
-      }
-    : null;
+  const editInitial = selected ? {
+    course_id:   selected.course_id,
+    course_name: selected.course_name,
+    tuition_fee: selected.tuition_fee != null ? String(selected.tuition_fee) : '',
+    start_date:  selected.start_date ? selected.start_date.slice(0, 10) : '',
+    end_date:    selected.end_date   ? selected.end_date.slice(0, 10)   : '',
+    status:      selected.status || 'Wait for active',
+    description: selected.description || '',
+  } : null;
 
-  // Search filter
-  const q = search.toLowerCase();
-  const filtered = courses.filter(c =>
-    c.course_name.toLowerCase().includes(q)
-  );
+  const q        = search.toLowerCase();
+  const filtered = courses.filter(c => c.course_name.toLowerCase().includes(q));
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PER_PAGE));
-  const safePage = Math.min(page, totalPages);
-  const paged = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
+  const safePage   = Math.min(page, totalPages);
+  const paged      = filtered.slice((safePage - 1) * PER_PAGE, safePage * PER_PAGE);
 
   const handleSearch = v => { setSearch(v); setPage(1); };
 
@@ -482,6 +860,7 @@ export default function ManageCoursePage() {
                   course={course}
                   index={idx}
                   onDots={openDots}
+                  onCardClick={openMaterials}
                 />
               ))}
             </div>
@@ -504,7 +883,7 @@ export default function ManageCoursePage() {
         </div>
       </div>
 
-      {/* ── Modals ── */}
+      {/* ── Course modals ── */}
       {modal === 'add' && (
         <CourseForm onSave={onSaved} onCancel={closeModal} isEdit={false} />
       )}
@@ -532,6 +911,14 @@ export default function ManageCoursePage() {
           course={selected}
           onConfirm={onSaved}
           onCancel={closeModal}
+        />
+      )}
+
+      {/* ── Material list modal ── */}
+      {materialCourse && (
+        <MaterialListModal
+          course={materialCourse}
+          onClose={() => setMaterialCourse(null)}
         />
       )}
     </div>
