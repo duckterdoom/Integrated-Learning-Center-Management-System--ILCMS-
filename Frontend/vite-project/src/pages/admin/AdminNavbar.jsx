@@ -171,7 +171,7 @@ export default function AdminNavbar() {
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="2" width="22" height="16" rx="2"/><rect x="3" y="4" width="18" height="11" rx="1"/><line x1="10" y1="18" x2="14" y2="18"/><circle cx="12" cy="8" r="1.6"/><path d="M8 13.5q4-4 8 0"/><circle cx="6.5" cy="9" r="1.1"/><path d="M4 13.5q2.5-2.8 4.5-1.5"/><circle cx="17.5" cy="9" r="1.1"/><path d="M20 13.5q-2.5-2.8-4.5-1.5"/></svg>
           Manage Class
         </button>
-        <button className="nav-item">
+        <button className="nav-item" onClick={() => navigate('/admin/manage-course')}>
           <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="2" width="20" height="14" rx="2"/><path d="M1 18h22"/><path d="M9 16h6"/><path d="M12 5.5l5 3-5 3-5-3z"/><path d="M9 9.5v2.5q3 2 6 0v-2.5"/><line x1="17" y1="8.5" x2="17" y2="12"/><circle cx="17" cy="12.4" r="0.55" fill="currentColor" stroke="none"/></svg>
           Manage Course
         </button>

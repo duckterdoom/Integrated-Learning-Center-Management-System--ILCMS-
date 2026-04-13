@@ -7,6 +7,7 @@ import ManageAccountPage from './pages/admin/ManageAccountPage';
 import ManageClassPage from './pages/staff/ManageClassPage';
 import ManageCoursePage from './pages/staff/ManageCoursePage';
 import AdminManageClassPage from './pages/admin/AdminManageClassPage';
+import AdminManageCoursePage from './pages/admin/AdminManageCoursePage';
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -65,6 +66,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={['Admin']}>
               <AdminManageClassPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/admin/manage-course"
+          element={
+            <ProtectedRoute allowedRoles={['Admin']}>
+              <AdminManageCoursePage />
             </ProtectedRoute>
           }
         />

@@ -10,7 +10,11 @@ export async function getMaterials(req, res) {
 
   try {
     const [rows] = await pool.query(
-      'SELECT * FROM Material WHERE course_id = ? ORDER BY created_at DESC',
+      `SELECT m.*, u.username AS created_by_name
+       FROM Material m
+       LEFT JOIN \`User\` u ON m.created_by = u.user_id
+       WHERE m.course_id = ?
+       ORDER BY m.created_at DESC`,
       [course_id]
     );
     res.json({ data: rows });

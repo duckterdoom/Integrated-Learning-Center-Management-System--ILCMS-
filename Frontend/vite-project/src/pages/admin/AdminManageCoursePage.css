@@ -1,0 +1,734 @@
+/* ══════════════════════════════════════════════════════
+   Admin Manage Course Page  (amcp- prefix)
+══════════════════════════════════════════════════════ */
+
+/* ── Page content area ── */
+.amcp-content {
+  padding: 20px 24px;
+  background: #e8e8e8;
+  min-height: calc(100vh - 60px - 39px);
+}
+
+/* ── Page header row ── */
+.amcp-page-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.amcp-title {
+  font-size: 26px;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 2px;
+}
+
+.amcp-subtitle {
+  font-size: 14px;
+  color: #555;
+  margin: 0;
+}
+
+.amcp-btn-group {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.amcp-add-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.amcp-add-btn:hover { background: #218838; }
+
+/* ── Card container ── */
+.amcp-card {
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+}
+
+/* ── Red search bar ── */
+.amcp-search-bar {
+  background: #cc0000;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+
+.amcp-search-input {
+  background: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 6px 10px;
+  font-size: 13px;
+  outline: none;
+  width: 220px;
+  color: #333;
+}
+
+/* ── Table ── */
+.amcp-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.amcp-table th {
+  background: #fff;
+  padding: 11px 14px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.amcp-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee;
+  color: #333;
+}
+
+.amcp-table tr:hover td { background: #fafafa; }
+
+.amcp-table .amcp-td-name { text-align: left; }
+
+/* ── Status colored text ── */
+.amcp-status {
+  font-size: 13px;
+  font-weight: 600;
+  font-style: italic;
+}
+
+.amcp-status--active  { color: #28a745; }
+.amcp-status--waiting { color: #e6a817; }
+.amcp-status--finish  { color: #dc3545; }
+
+/* ── Action icon button ── */
+.amcp-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: #555;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.amcp-action-btn svg { width: 18px; height: 18px; }
+
+.amcp-action-btn:hover {
+  color: #cc0000;
+  background: #fdf2f2;
+}
+
+/* ── Empty / Loading / Error states ── */
+.amcp-empty,
+.amcp-loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}
+
+.amcp-error-state {
+  text-align: center;
+  padding: 40px;
+  color: #dc3545;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── Pagination ── */
+.amcp-pagination {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px;
+  background: #f5f5f5;
+  border-top: 1px solid #ddd;
+}
+
+.amcp-page-btn {
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  padding: 4px 10px;
+  font-size: 13px;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.amcp-page-btn:hover { border-color: #cc0000; color: #cc0000; }
+
+.amcp-page-btn--active {
+  background: #cc0000;
+  border-color: #cc0000;
+  color: #fff;
+}
+
+.amcp-page-btn--active:hover { background: #a00000; border-color: #a00000; }
+
+/* ══════════════════════════════════════════════════════
+   Shared modal styles for Admin Course Page (amcp-modal-)
+══════════════════════════════════════════════════════ */
+
+.amcp-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.amcp-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 540px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+}
+
+.amcp-modal--sm { max-width: 400px; }
+
+.amcp-modal-header {
+  background: #cc0000;
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.amcp-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.amcp-modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.amcp-modal-close:hover { opacity: 1; }
+
+.amcp-modal-body {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.amcp-modal-footer {
+  padding: 14px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* ── Form fields ── */
+.amcp-form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.amcp-form-row--full { grid-template-columns: 1fr; }
+
+.amcp-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.amcp-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.amcp-form-group input,
+.amcp-form-group select,
+.amcp-form-group textarea {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  background: #fff;
+  font-family: inherit;
+  transition: border-color 0.15s;
+}
+
+.amcp-form-group input:focus,
+.amcp-form-group select:focus,
+.amcp-form-group textarea:focus {
+  border-color: #cc0000;
+  box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
+}
+
+.amcp-form-group textarea { resize: vertical; }
+
+/* ── Info grid ── */
+.amcp-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.amcp-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.amcp-info-item--full { grid-column: 1 / -1; }
+
+.amcp-info-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.amcp-info-value {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+  padding: 7px 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  min-height: 34px;
+  word-break: break-word;
+}
+
+/* ── Buttons ── */
+.amcp-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 9px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.amcp-btn--primary { background: #cc0000; color: #fff; }
+.amcp-btn--primary:hover { background: #a00000; }
+
+.amcp-btn--save { background: #28a745; color: #fff; }
+.amcp-btn--save:hover { background: #218838; }
+
+.amcp-btn--danger { background: #dc3545; color: #fff; }
+.amcp-btn--danger:hover { background: #b02a37; }
+
+.amcp-btn--cancel { background: #fff; color: #333; border: 2px solid #ccc; }
+.amcp-btn--cancel:hover { border-color: #999; }
+
+.amcp-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Error message ── */
+.amcp-error {
+  background: #fdf2f2;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  color: #721c24;
+  font-size: 13px;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+}
+
+/* ── Delete confirm ── */
+.amcp-delete-msg {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin: 20px 0 28px;
+  line-height: 1.5;
+}
+
+/* ══════════════════════════════════════════════════════
+   Admin Material modals  (amat- prefix, red theme)
+══════════════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.amat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.amat-overlay--sub { z-index: 1100; }
+
+/* ── Base modal ── */
+.amat-modal {
+  background: #fff;
+  border-radius: 8px;
+  width: 100%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.amat-modal--list {
+  max-width: 640px;
+  max-height: 85vh;
+}
+
+.amat-modal--form {
+  max-width: 460px;
+  max-height: 90vh;
+}
+
+.amat-modal--info {
+  max-width: 480px;
+  max-height: 90vh;
+}
+
+.amat-modal--confirm {
+  max-width: 400px;
+}
+
+/* ── Red modal header ── */
+.amat-modal-header {
+  background: #cc0000;
+  color: #fff;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.amat-modal-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.amat-modal-close {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  opacity: 0.8;
+  transition: opacity 0.15s;
+}
+
+.amat-modal-close:hover { opacity: 1; }
+
+/* ── Material list search bar (red) ── */
+.amat-search-bar {
+  background: #cc0000;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  flex-shrink: 0;
+}
+
+.amat-search-input {
+  background: #fff;
+  border: none;
+  border-radius: 3px;
+  padding: 5px 9px;
+  font-size: 13px;
+  outline: none;
+  width: 200px;
+  color: #333;
+}
+
+/* ── Modal body ── */
+.amat-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 80px;
+}
+
+.amat-modal-body--padded {
+  padding: 20px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* ── Material table ── */
+.amat-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.amat-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.amat-table th {
+  background: #fff;
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-weight: 600;
+  color: #333;
+  white-space: nowrap;
+}
+
+.amat-table td {
+  padding: 10px 14px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+  border-right: 1px solid #eee;
+  color: #333;
+}
+
+.amat-table tr:hover td { background: #fafafa; }
+
+.amat-td-name { text-align: left !important; }
+
+/* ── Action icon button ── */
+.amat-action-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  color: #555;
+  display: inline-flex;
+  align-items: center;
+  transition: color 0.15s, background 0.15s;
+}
+
+.amat-action-btn svg { width: 18px; height: 18px; }
+
+.amat-action-btn:hover {
+  color: #cc0000;
+  background: #fdf2f2;
+}
+
+/* ── State messages ── */
+.amat-state {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+  font-size: 14px;
+}
+
+.amat-state--error { color: #dc3545; font-weight: 600; }
+
+/* ── Footer ── */
+.amat-modal-footer {
+  padding: 12px 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid #eee;
+  flex-shrink: 0;
+}
+
+/* ── Info grid ── */
+.amat-info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.amat-info-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.amat-info-value {
+  font-size: 14px;
+  color: #222;
+  font-weight: 500;
+  padding: 7px 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #eee;
+  min-height: 34px;
+  word-break: break-all;
+}
+
+.amat-info-value a { color: #cc0000; text-decoration: none; }
+.amat-info-value a:hover { text-decoration: underline; }
+
+/* ── Form fields ── */
+.amat-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 14px;
+}
+
+.amat-form-group label {
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+}
+
+.amat-form-group input,
+.amat-form-group select {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 8px 10px;
+  font-size: 14px;
+  color: #333;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.15s;
+}
+
+.amat-form-group input:focus,
+.amat-form-group select:focus {
+  border-color: #cc0000;
+  box-shadow: 0 0 0 2px rgba(204, 0, 0, 0.1);
+}
+
+.amat-form-group input:read-only {
+  background: #f5f5f5;
+  opacity: 0.8;
+  cursor: default;
+}
+
+/* ── Upload area ── */
+.amat-upload-area {
+  border: 2px dashed #ccc;
+  border-radius: 6px;
+  padding: 18px;
+  text-align: center;
+  cursor: pointer;
+  background: #fafafa;
+  transition: border-color 0.15s, background 0.15s;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.amat-upload-area:hover {
+  border-color: #cc0000;
+  background: #fff5f5;
+}
+
+.amat-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  color: #888;
+  font-size: 13px;
+  pointer-events: none;
+}
+
+.amat-upload-placeholder svg { color: #aaa; }
+
+.amat-upload-hint { font-size: 11px; color: #bbb; }
+
+.amat-upload-filename {
+  font-size: 13px;
+  color: #cc0000;
+  font-weight: 600;
+  word-break: break-all;
+  padding: 0 8px;
+}
+
+/* ── Error ── */
+.amat-error {
+  background: #fdf2f2;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  color: #721c24;
+  font-size: 13px;
+  padding: 9px 12px;
+  margin-bottom: 14px;
+}
+
+/* ── Buttons ── */
+.amat-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 9px 22px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.amat-btn--primary { background: #cc0000; color: #fff; }
+.amat-btn--primary:hover { background: #a00000; }
+
+.amat-btn--cancel { background: #fff; color: #333; border: 2px solid #ccc; }
+.amat-btn--cancel:hover { border-color: #999; }
+
+.amat-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Confirm ── */
+.amat-confirm-msg {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  margin: 24px 0 28px;
+  line-height: 1.5;
+}
+
+/* ── Clickable table row hint ── */
+.amcp-table tbody tr { cursor: pointer; }
