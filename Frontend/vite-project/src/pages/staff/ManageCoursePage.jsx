@@ -86,6 +86,13 @@ function fmtFee(val) {
   return Number(val).toLocaleString('vi-VN');
 }
 
+function calcDuration(s, e) {
+  if (!s || !e) return null;
+  const months = Math.round((new Date(e) - new Date(s)) / (1000 * 60 * 60 * 24 * 30));
+  if (months < 1) return null;
+  return `${months} month${months !== 1 ? 's' : ''}`;
+}
+
 function formatFileSize(bytes) {
   if (!bytes) return '—';
   if (bytes < 1024) return `${bytes} B`;
@@ -269,6 +276,12 @@ function InfoModal({ course, onClose, onEdit, onDelete }) {
           <span className="mcp-info-value">{fmt(course.end_date)}</span>
         </div>
         <div className="mcp-info-row">
+          <span className="mcp-info-label">Duration:</span>
+          <span className="mcp-info-value">
+            {calcDuration(course.start_date, course.end_date) || '—'}
+          </span>
+        </div>
+        <div className="mcp-info-row">
           <span className="mcp-info-label">Status:</span>
           <span className="mcp-info-value"><StatusBadge status={course.status} /></span>
         </div>
@@ -441,6 +454,10 @@ function MaterialForm({ courseId, courseName, initial, onSave, onCancel, isEdit 
 }
 
 function MaterialInfoModal({ material, onClose, onEdit, onDelete }) {
+  const fileUrl     = material.file_url ? `${BASE}${material.file_url}` : null;
+  const viewUrl     = fileUrl || material.link_url || null;
+  const downloadUrl = fileUrl || null;
+
   return (
     <div className="mat-overlay mat-overlay--sub" onClick={onClose}>
       <div className="mat-modal mat-modal--info" onClick={e => e.stopPropagation()}>
@@ -474,6 +491,47 @@ function MaterialInfoModal({ material, onClose, onEdit, onDelete }) {
           <span className="mat-info-value">
             {material.created_at ? new Date(material.created_at).toLocaleDateString('vi-VN') : '—'}
           </span>
+        </div>
+
+        {/* ── View / Download quick-action row ── */}
+        <div className="mat-file-actions">
+          {viewUrl ? (
+            <a href={viewUrl} target="_blank" rel="noopener noreferrer" className="mat-file-btn mat-file-btn--view" title="View file">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              View
+            </a>
+          ) : (
+            <span className="mat-file-btn mat-file-btn--view mat-file-btn--disabled" title="No file or link">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              View
+            </span>
+          )}
+
+          {downloadUrl ? (
+            <a href={downloadUrl} download className="mat-file-btn mat-file-btn--dl" title="Download file">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download
+            </a>
+          ) : (
+            <span className="mat-file-btn mat-file-btn--dl mat-file-btn--disabled" title="No uploaded file">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download
+            </span>
+          )}
         </div>
 
         <div className="mat-info-actions">
@@ -676,6 +734,11 @@ function CourseCard({ course, index, onDots, onCardClick }) {
         <p className="mcp-card-dates">
           Start date: {fmt(course.start_date)} — End date: {fmt(course.end_date)}
         </p>
+        {calcDuration(course.start_date, course.end_date) && (
+          <p className="mcp-card-duration">
+            Duration: {calcDuration(course.start_date, course.end_date)}
+          </p>
+        )}
       </div>
     </div>
   );

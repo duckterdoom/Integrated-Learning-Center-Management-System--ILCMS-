@@ -56,6 +56,8 @@ function StatusText({ status }) {
   return <span className="amc-status amc-status--waiting">Wait for actived</span>;
 }
 
+const SCHEDULE_OPTIONS = ['MON-WED-FRI', 'TUE-THUR-SAT'];
+
 // ── Add / Edit form ────────────────────────────────────────────────────────
 const EMPTY_FORM = {
   course_id: '',
@@ -64,6 +66,7 @@ const EMPTY_FORM = {
   start_date: '',
   end_date: '',
   capacity: '',
+  schedule_info: '',
   status: 'Waiting for Activation',
 };
 
@@ -77,9 +80,15 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
   const handleSubmit = async () => {
     setError('');
 
-    // AC: Start date must be today or a future date (create only)
-    if (!isEdit && form.start_date) {
-      const today = new Date().toISOString().split('T')[0];
+    if (!form.capacity || Number(form.capacity) < 1) {
+      setError('Capacity must be greater than 0.');
+      return;
+    }
+
+    // Start date must be today or a future date (create and update)
+    if (form.start_date) {
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
       if (form.start_date < today) {
         setError('Start date must be today or a future date.');
         return;
@@ -97,6 +106,7 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
         start_date: form.start_date,
         end_date: form.end_date || null,
         capacity: Number(form.capacity),
+        schedule_info: form.schedule_info || null,
         status: form.status,
       };
       const res = await apiFetch(url, { method, body: JSON.stringify(body) });
@@ -179,7 +189,16 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
           </div>
         </div>
 
-        <div className="amc-form-row amc-form-row--full">
+        <div className="amc-form-row">
+          <div className="amc-form-group">
+            <label>Schedule Info</label>
+            <select value={form.schedule_info} onChange={e => set('schedule_info', e.target.value)}>
+              <option value="">-- Select schedule --</option>
+              {SCHEDULE_OPTIONS.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
           <div className="amc-form-group">
             <label>Status <span>*</span></label>
             <select value={form.status} onChange={e => set('status', e.target.value)}>
@@ -240,7 +259,11 @@ function InfoModal({ cls, onClose, onEdit, onDelete }) {
               <span className="amc-info-label">End Date</span>
               <span className="amc-info-value">{fmt(cls.end_date)}</span>
             </div>
-            <div className="amc-info-item amc-info-item--full">
+            <div className="amc-info-item">
+              <span className="amc-info-label">Schedule Info</span>
+              <span className="amc-info-value">{cls.schedule_info || '—'}</span>
+            </div>
+            <div className="amc-info-item">
               <span className="amc-info-label">Status</span>
               <span className="amc-info-value"><StatusText status={cls.status} /></span>
             </div>
@@ -363,6 +386,7 @@ export default function AdminManageClassPage() {
         start_date: fmt(selected.start_date),
         end_date: selected.end_date ? fmt(selected.end_date) : '',
         capacity: String(selected.capacity),
+        schedule_info: selected.schedule_info || '',
         status: selected.status,
       }
     : null;
@@ -450,6 +474,7 @@ export default function AdminManageClassPage() {
                   <th>Class Name</th>
                   <th>Course Name</th>
                   <th>Teacher Name</th>
+                  <th>Schedule</th>
                   <th>Start Date</th>
                   <th>Capacity</th>
                   <th>Status</th>
@@ -463,6 +488,7 @@ export default function AdminManageClassPage() {
                     <td style={{ textAlign: 'left' }}>{cls.class_name}</td>
                     <td>{cls.course_name}</td>
                     <td>{cls.teacher_name}</td>
+                    <td><span className="amc-schedule-badge">{cls.schedule_info || '—'}</span></td>
                     <td>{fmt(cls.start_date)}</td>
                     <td>{cls.capacity}</td>
                     <td><StatusText status={cls.status} /></td>

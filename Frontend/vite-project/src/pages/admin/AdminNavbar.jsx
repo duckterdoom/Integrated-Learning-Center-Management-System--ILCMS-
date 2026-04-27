@@ -186,17 +186,12 @@ export default function AdminNavbar() {
 
         <div className="navbar-spacer" />
 
-        <div className="navbar-search">
-          <input type="text" placeholder="Customer" />
-          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#888" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-        </div>
-
         {/* ── Notification Bell ── */}
         <div className="notif-wrap" ref={notifRef}>
           <button
             className={`notif-bell${resetRequests.length > 0 ? ' notif-bell--active' : ''}`}
             onClick={() => setShowResetNotif((v) => !v)}
-            title="Password reset requests"
+            title="Notifications"
           >
             <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
@@ -209,36 +204,54 @@ export default function AdminNavbar() {
 
           {showResetNotif && (
             <div className="notif-dropdown">
-              <div className="notif-dropdown-header">
-                <span className="notif-dropdown-title">Password Reset Requests</span>
-                <span className="notif-dropdown-count">{resetRequests.length} pending</span>
+              {/* Header */}
+              <div className="notif-header">
+                <span className="notif-header-title">Notifications</span>
+                <button className="notif-mark-read" onClick={() => setShowResetNotif(false)}>
+                  Mark all as read
+                </button>
               </div>
+
+              {/* View All Activities */}
+              <div className="notif-view-all-wrap">
+                <button className="notif-view-all" onClick={() => setShowResetNotif(false)}>
+                  View All Activities
+                </button>
+              </div>
+
+              {/* Notification items */}
               {resetRequests.length === 0 ? (
-                <p className="notif-empty">No pending requests</p>
+                <p className="notif-empty">No notifications</p>
               ) : (
                 <ul className="notif-list">
                   {resetRequests.map((req) => (
-                    <li key={req.request_id} className="notif-item">
-                      <div className="notif-item-info">
-                        <span className="notif-username">{req.username}</span>
-                        <span className="notif-time">{formatDateTime(req.requested_at)}</span>
+                    <li
+                      key={req.request_id}
+                      className="notif-item"
+                      onClick={() => {
+                        setShowResetNotif(false);
+                        setResetModalError('');
+                        setResetModal({ mode: 'confirm', request: req });
+                      }}
+                    >
+                      <span className="notif-dot" />
+                      <div className="notif-item-content">
+                        <p className="notif-item-title">
+                          {req.username} requested change password
+                        </p>
+                        <span className="notif-item-time">{formatDateTime(req.requested_at)}</span>
                       </div>
-                      <button
-                        className="notif-reset-btn"
-                        onClick={() => {
-                          setShowResetNotif(false);
-                          setResetModalError('');
-                          setResetModal({ mode: 'confirm', request: req });
-                        }}
-                      >
-                        Reset
-                      </button>
                     </li>
                   ))}
                 </ul>
               )}
             </div>
           )}
+        </div>
+
+        <div className="navbar-search">
+          <input type="text" placeholder="Customer" />
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="#888" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         </div>
 
         {/* ── User + Logout ── */}

@@ -446,3 +446,18 @@
 .amc-delete-msg strong {
   color: #cc0000;
 }
+
+
+/* ── Schedule badge ── */
+.amc-schedule-badge {
+  display: inline-block;
+  background: #eef2ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  padding: 2px 9px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  white-space: nowrap;
+}

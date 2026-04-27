@@ -160,7 +160,7 @@ function InfoModal({ account, onClose, onUpdate, onRemove, onPasswordSaved }) {
 
         <div className="ma-modal-actions" style={{ marginTop: '1.5rem' }}>
           <button className="ma-btn-submit" onClick={onUpdate}>Update</button>
-          <button className="ma-btn-remove" onClick={onRemove}>Remove</button>
+          <button className="ma-btn-remove" onClick={onRemove}>Delete</button>
           <button className="ma-btn-cancel" onClick={onClose}>Cancel</button>
         </div>
       </div>
@@ -188,7 +188,6 @@ function ConfirmDeleteModal({ onConfirm, onClose, apiError }) {
 function EditModal({ account, onClose, onSubmit, apiError }) {
   const [form, setForm] = useState({
     full_name: account.full_name || '',
-    email:     account.email     || '',
     role:      account.role_name || '',
   });
   const [formError, setFormError] = useState('');
@@ -197,10 +196,10 @@ function EditModal({ account, onClose, onSubmit, apiError }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!form.role) { setFormError('Please select a role.'); return; }
+    if (!form.full_name.trim()) { setFormError('Full name is required.'); return; }
+    if (!form.role)             { setFormError('Please select a role.'); return; }
     onSubmit({
-      full_name: form.full_name.trim() || account.username,
-      email:     form.email.trim()     || account.email,
+      full_name: form.full_name.trim(),
       role_id:   ROLE_ID[form.role],
     });
   };
@@ -220,7 +219,7 @@ function EditModal({ account, onClose, onSubmit, apiError }) {
           </div>
           <div className="ma-field">
             <label className="ma-label">Email</label>
-            <input className="ma-input" type="email" value={form.email} onChange={set('email')} />
+            <input className="ma-input" type="email" value={account.email || ''} readOnly style={{ opacity: 0.6, cursor: 'not-allowed' }} />
           </div>
           <div className="ma-field">
             <label className="ma-label">Role</label>
@@ -252,6 +251,12 @@ export default function ManageAccountPage() {
   const [modalError, setModalError] = useState('');
   const [page,       setPage]       = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const showSuccess = (msg) => {
+    setSuccessMsg(msg);
+    setTimeout(() => setSuccessMsg(''), 3500);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -319,6 +324,7 @@ export default function ManageAccountPage() {
       if (!res.ok) { setModalError(json.message || 'Failed to create user.'); return; }
       closeModal();
       fetchUsers(search, page);
+      showSuccess('User created successfully.');
     } catch {
       setModalError('Network error. Is the backend running?');
     }
@@ -333,6 +339,7 @@ export default function ManageAccountPage() {
       if (!res.ok) { setModalError(json.message || 'Failed to delete user.'); return; }
       closeModal();
       fetchUsers(search, page);
+      showSuccess('User deleted successfully.');
     } catch {
       setModalError('Network error. Is the backend running?');
     }
@@ -351,6 +358,7 @@ export default function ManageAccountPage() {
       if (!res.ok) { setModalError(json.message || 'Failed to update user.'); return; }
       closeModal();
       fetchUsers(search, page);
+      showSuccess('User updated successfully.');
     } catch {
       setModalError('Network error. Is the backend running?');
     }
@@ -365,6 +373,16 @@ export default function ManageAccountPage() {
   return (
     <div>
       <AdminNavbar />
+
+      {/* ── Success toast ── */}
+      {successMsg && (
+        <div className="ma-success-toast">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+          {successMsg}
+        </div>
+      )}
 
       {/* Breadcrumb */}
       <div className="breadcrumb">
@@ -396,22 +414,26 @@ export default function ManageAccountPage() {
           <table className="account-table">
             <thead>
               <tr>
-                <th>ID</th>
-                <th>Tên đăng nhập</th>
-                <th>Vai trò</th>
-                <th>Ngày tạo</th>
-                <th>Thao tác</th>
+                <th>No.</th>
+                <th>Username</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Created Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>Loading...</td></tr>
+                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>Loading...</td></tr>
               ) : users.length === 0 ? (
-                <tr><td colSpan="5" style={{ textAlign: 'center', padding: '2rem' }}>No accounts found.</td></tr>
-              ) : users.map((u) => (
+                <tr><td colSpan="7" style={{ textAlign: 'center', padding: '2rem' }}>No accounts found.</td></tr>
+              ) : users.map((u, idx) => (
                 <tr key={u.user_id}>
-                  <td>{u.user_id}</td>
+                  <td>{(page - 1) * 10 + idx + 1}</td>
                   <td className="td-username">{u.username}</td>
+                  <td>{u.full_name || '—'}</td>
+                  <td>{u.email || '—'}</td>
                   <td><RoleBadge role={u.role_name} /></td>
                   <td>{formatDate(u.created_at)}</td>
                   <td>

@@ -3,20 +3,30 @@ import pool from '../config/db.js';
 import fs from 'fs';
 import path from 'path';
 
-// GET /api/materials?course_id=X
+// GET /api/materials?course_id=X  (course_id optional — omit to get all)
 export async function getMaterials(req, res) {
   const { course_id } = req.query;
-  if (!course_id) return res.status(400).json({ message: 'course_id is required' });
 
   try {
-    const [rows] = await pool.query(
-      `SELECT m.*, u.username AS created_by_name
-       FROM Material m
-       LEFT JOIN \`User\` u ON m.created_by = u.user_id
-       WHERE m.course_id = ?
-       ORDER BY m.created_at DESC`,
-      [course_id]
-    );
+    let rows;
+    if (course_id) {
+      [rows] = await pool.query(
+        `SELECT m.*, u.username AS created_by_name
+         FROM Material m
+         LEFT JOIN \`User\` u ON m.created_by = u.user_id
+         WHERE m.course_id = ?
+         ORDER BY m.created_at DESC`,
+        [course_id]
+      );
+    } else {
+      [rows] = await pool.query(
+        `SELECT m.*, u.username AS created_by_name, c.course_name
+         FROM Material m
+         LEFT JOIN \`User\` u ON m.created_by = u.user_id
+         LEFT JOIN Course c ON m.course_id = c.course_id
+         ORDER BY m.created_at DESC`
+      );
+    }
     res.json({ data: rows });
   } catch (err) {
     console.error('[getMaterials]', err);

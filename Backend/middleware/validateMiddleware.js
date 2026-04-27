@@ -188,7 +188,12 @@ export const validateCreateClass = [
 
   body('capacity')
     .notEmpty().withMessage('Capacity is required')
-    .isInt({ min: 1, max: 9999 }).withMessage('Capacity must be a number between 1 and 9999'),
+    .isInt({ min: 1, max: 200 }).withMessage('Capacity must be greater than 0'),
+
+  body('schedule_info')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['MON-WED-FRI', 'TUE-THUR-SAT'])
+    .withMessage('Schedule must be MON-WED-FRI or TUE-THUR-SAT'),
 
   body('status')
     .optional()
@@ -224,7 +229,12 @@ export const validateUpdateClass = [
 
   body('capacity')
     .notEmpty().withMessage('Capacity is required')
-    .isInt({ min: 1, max: 9999 }).withMessage('Capacity must be a number between 1 and 9999'),
+    .isInt({ min: 1, max: 200 }).withMessage('Capacity must be greater than 0'),
+
+  body('schedule_info')
+    .optional({ nullable: true, checkFalsy: true })
+    .isIn(['MON-WED-FRI', 'TUE-THUR-SAT'])
+    .withMessage('Schedule must be MON-WED-FRI or TUE-THUR-SAT'),
 
   body('status')
     .notEmpty().withMessage('Status is required')

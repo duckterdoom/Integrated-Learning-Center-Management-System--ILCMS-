@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ismartLogo from '../../assets/ismart-logo.png';
 import './StaffHomePage.css';
@@ -61,6 +61,8 @@ function StatusBadge({ status }) {
 }
 
 // ── Add / Edit form ────────────────────────────────────────────────────────
+const SCHEDULE_OPTIONS = ['MON-WED-FRI', 'TUE-THUR-SAT'];
+
 const EMPTY_FORM = {
   course_id: '',
   class_name: '',
@@ -68,6 +70,7 @@ const EMPTY_FORM = {
   start_date: '',
   end_date: '',
   capacity: '',
+  schedule_info: '',
   status: 'Waiting for Activation',
 };
 
@@ -80,6 +83,22 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
 
   const handleSubmit = async () => {
     setError('');
+
+    if (!form.capacity || Number(form.capacity) < 1) {
+      setError('Capacity must be greater than 0.');
+      return;
+    }
+
+    // Start date must be today or a future date (create and update)
+    if (form.start_date) {
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      if (form.start_date < today) {
+        setError('Start date must be today or a future date.');
+        return;
+      }
+    }
+
     setSaving(true);
     try {
       const method = isEdit ? 'PUT' : 'POST';
@@ -91,6 +110,7 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
         start_date: form.start_date,
         end_date: form.end_date || null,
         capacity: Number(form.capacity),
+        schedule_info: form.schedule_info || null,
         status: form.status,
       };
       const res = await apiFetch(url, { method, body: JSON.stringify(body) });
@@ -146,6 +166,7 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
             <input
               type="number"
               min="1"
+              max="200"
               value={form.capacity}
               onChange={e => set('capacity', e.target.value)}
               placeholder="e.g. 30"
@@ -172,7 +193,16 @@ function ClassForm({ initial, courses, onSave, onCancel, isEdit }) {
           </div>
         </div>
 
-        <div className="mc-form-row mc-form-row--full">
+        <div className="mc-form-row">
+          <div className="mc-form-group">
+            <label>Schedule Info</label>
+            <select value={form.schedule_info} onChange={e => set('schedule_info', e.target.value)}>
+              <option value="">-- Select schedule --</option>
+              {SCHEDULE_OPTIONS.map(s => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
           <div className="mc-form-group">
             <label>Status <span>*</span></label>
             <select value={form.status} onChange={e => set('status', e.target.value)}>
@@ -233,7 +263,11 @@ function InfoModal({ cls, onClose, onEdit }) {
               <span className="mc-info-label">End Date</span>
               <span className="mc-info-value">{fmt(cls.end_date)}</span>
             </div>
-            <div className="mc-info-item mc-info-item--full">
+            <div className="mc-info-item">
+              <span className="mc-info-label">Schedule Info</span>
+              <span className="mc-info-value">{cls.schedule_info || '—'}</span>
+            </div>
+            <div className="mc-info-item">
               <span className="mc-info-label">Status</span>
               <span className="mc-info-value"><StatusBadge status={cls.status} /></span>
             </div>
@@ -300,13 +334,20 @@ function DeleteModal({ cls, onConfirm, onCancel }) {
 // ── Main page ──────────────────────────────────────────────────────────────
 export default function ManageClassPage() {
   const navigate = useNavigate();
-  const [showLogout, setShowLogout] = useState(false);
-  const [classes, setClasses] = useState([]);
-  const [courses, setCourses] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [showLogout, setShowLogout]   = useState(false);
+  const [classes,    setClasses]      = useState([]);
+  const [courses,    setCourses]      = useState([]);
+  const [loading,    setLoading]      = useState(true);
+
+  // search + filter
+  const [search,       setSearch]     = useState('');
+  const [showFilter,   setShowFilter] = useState(false);
+  const [sortField,    setSortField]  = useState('class_id');
+  const [sortDir,      setSortDir]    = useState('asc');
+  const filterRef = useRef(null);
 
   // modal state
-  const [modal, setModal] = useState(null); // 'add' | 'info' | 'edit' | 'delete'
+  const [modal,    setModal]    = useState(null);
   const [selected, setSelected] = useState(null);
 
   const user = (() => {
@@ -341,6 +382,44 @@ export default function ManageClassPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
+  // Close filter dropdown on outside click
+  useEffect(() => {
+    function handler(e) {
+      if (filterRef.current && !filterRef.current.contains(e.target)) setShowFilter(false);
+    }
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  // Filtered + sorted list
+  const displayedClasses = [...classes]
+    .filter(c => {
+      const q = search.toLowerCase();
+      return (
+        c.class_name?.toLowerCase().includes(q) ||
+        c.teacher_name?.toLowerCase().includes(q) ||
+        c.course_name?.toLowerCase().includes(q) ||
+        c.status?.toLowerCase().includes(q)
+      );
+    })
+    .sort((a, b) => {
+      let va = a[sortField] ?? '';
+      let vb = b[sortField] ?? '';
+      if (typeof va === 'string') va = va.toLowerCase();
+      if (typeof vb === 'string') vb = vb.toLowerCase();
+      if (va < vb) return sortDir === 'asc' ? -1 : 1;
+      if (va > vb) return sortDir === 'asc' ?  1 : -1;
+      return 0;
+    });
+
+  const SORT_OPTIONS = [
+    { label: 'ID',         field: 'class_id' },
+    { label: 'Class Name', field: 'class_name' },
+    { label: 'Teacher',    field: 'teacher_name' },
+    { label: 'Status',     field: 'status' },
+    { label: 'Start Date', field: 'start_date' },
+  ];
+
   const closeModal = () => { setModal(null); setSelected(null); };
 
   const onSaved = () => { closeModal(); loadData(); };
@@ -359,6 +438,7 @@ export default function ManageClassPage() {
         start_date: fmt(selected.start_date),
         end_date: selected.end_date ? fmt(selected.end_date) : '',
         capacity: String(selected.capacity),
+        schedule_info: selected.schedule_info || '',
         status: selected.status,
       }
     : null;
@@ -434,10 +514,54 @@ export default function ManageClassPage() {
         <div className="mc-content">
           <div className="mc-card">
             <div className="mc-card-header">
-              <div className="mc-card-header-left">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="2" width="22" height="16" rx="2"/><rect x="3" y="4" width="18" height="11" rx="1"/><line x1="10" y1="18" x2="14" y2="18"/><circle cx="12" cy="8" r="1.6"/><path d="M8 13.5q4-4 8 0"/><circle cx="6.5" cy="9" r="1.1"/><path d="M4 13.5q2.5-2.8 4.5-1.5"/><circle cx="17.5" cy="9" r="1.1"/><path d="M20 13.5q-2.5-2.8-4.5-1.5"/></svg>
-                Class List
+              {/* Search bar */}
+              <div className="mc-search-bar">
+                <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2">
+                  <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
               </div>
+
+              {/* Filter / Sort */}
+              <div className="mc-filter-wrap" ref={filterRef}>
+                <button
+                  className={`mc-filter-btn${showFilter ? ' mc-filter-btn--active' : ''}`}
+                  title="Filter & Sort"
+                  onClick={() => setShowFilter(v => !v)}
+                >
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                  </svg>
+                </button>
+
+                {showFilter && (
+                  <div className="mc-filter-dropdown">
+                    <div className="mc-filter-title">Sort by</div>
+                    {SORT_OPTIONS.map(opt => (
+                      <button
+                        key={opt.field}
+                        className={`mc-filter-option${sortField === opt.field ? ' mc-filter-option--active' : ''}`}
+                        onClick={() => {
+                          if (sortField === opt.field) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
+                          else { setSortField(opt.field); setSortDir('asc'); }
+                          setShowFilter(false);
+                        }}
+                      >
+                        {opt.label}
+                        {sortField === opt.field && (
+                          <span>{sortDir === 'asc' ? ' ↑' : ' ↓'}</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <button className="mc-add-btn" onClick={() => setModal('add')}>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="14" height="14"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 Add
@@ -456,6 +580,7 @@ export default function ManageClassPage() {
                     <th>Class Name</th>
                     <th>Course</th>
                     <th>Teacher</th>
+                    <th>Schedule</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Capacity</th>
@@ -464,12 +589,15 @@ export default function ManageClassPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {classes.map((cls, idx) => (
-                    <tr key={cls.class_id}>
+                  {displayedClasses.length === 0
+                    ? <tr><td colSpan={10} className="mc-empty">No results found.</td></tr>
+                    : displayedClasses.map((cls, idx) => (
+                    <tr key={cls.class_id} >
                       <td>{idx + 1}</td>
                       <td style={{ textAlign: 'left' }}>{cls.class_name}</td>
                       <td>{cls.course_name}</td>
                       <td>{cls.teacher_name}</td>
+                      <td><span className="mc-schedule-badge">{cls.schedule_info || '—'}</span></td>
                       <td>{fmt(cls.start_date)}</td>
                       <td>{fmt(cls.end_date)}</td>
                       <td>{cls.capacity}</td>

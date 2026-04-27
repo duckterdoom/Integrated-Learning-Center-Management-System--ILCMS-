@@ -120,7 +120,7 @@ npm install
 **Import database (có sẵn dữ liệu mẫu):**
 ```bash
 cd C:\ILCMS
-mysql -u root -p < ilcms_dump.sql
+mysql -u root -p < database/ilcms_db.sql
 ```
 Nhập mật khẩu root MySQL khi được hỏi → Enter.
 
@@ -128,7 +128,7 @@ Không có thông báo lỗi = import thành công ✓
 
 > **Ghi chú:** Nếu bỏ qua bước import, hệ thống vẫn hoạt động bình thường — Backend sẽ tự tạo database và chèn dữ liệu mẫu khi khởi động lần đầu (xem Bước 7).
 > Có **3 cách** để có dữ liệu mẫu:
-> 1. Import `ilcms_dump.sql` như trên (khuyến nghị cho tester)
+> 1. Import `database/ilcms_db.sql` như trên (khuyến nghị cho tester)
 > 2. Chạy Backend (`npm run dev`) — tự động tạo và seed dữ liệu
 > 3. Chạy `npm run db:setup` trong thư mục `Backend`
 
@@ -277,7 +277,7 @@ npm install
 **Import the database (includes sample data):**
 ```bash
 cd C:\ILCMS
-mysql -u root -p < ilcms_dump.sql
+mysql -u root -p < database/ilcms_db.sql
 ```
 Enter your MySQL root password when prompted → press Enter.
 
@@ -285,7 +285,7 @@ No error messages = database imported successfully ✓
 
 > **Note:** If you skip the import, the system still works — the Backend automatically creates the database and inserts sample data on first startup (see Step 7).
 > There are **3 ways** to get sample data:
-> 1. Import `ilcms_dump.sql` as above (recommended for testers)
+> 1. Import `database/ilcms_db.sql` as above (recommended for testers)
 > 2. Run the Backend (`npm run dev`) — auto-creates and seeds data
 > 3. Run `npm run db:setup` inside the `Backend` folder
 
@@ -353,7 +353,9 @@ http://localhost:5173
 
 ```
 ILCMS/
-├── ilcms_dump.sql                  ← ✅ Full database dump with sample data (import this)
+├── database/
+│   ├── ilcms_db.sql                ← ✅ Full database dump with sample data (import this)
+│   └── README.md                   ← Quick import instructions
 │
 ├── Backend/                        ← Node.js + Express API
 │   ├── config/
@@ -365,6 +367,7 @@ ILCMS/
 │   │   └── seed.js                 ← Seeds Admin account only
 │   ├── middleware/                 ← JWT auth, request validation
 │   ├── routes/                     ← API route definitions
+│   ├── uploads/                    ← Uploaded material files (not tracked by Git)
 │   ├── .env                        ← Environment config (set DB_PASSWORD)
 │   └── server.js                   ← App entry point (auto-seeds data on first run)
 │
@@ -377,7 +380,7 @@ ILCMS/
                 ├── auth/           ← LoginPage (with Forgot Password)
                 ├── admin/          ← AdminHomePage, ManageAccountPage, ManageClassPage
                 ├── staff/          ← StaffHomePage, ManageClassPage, ManageCoursePage
-                └── saler/          ← SalerHomePage
+                └── saler/          ← SalerHomePage, SalerAcademyPage
 ```
 
 ---

@@ -56,10 +56,10 @@ app.use('/api/auth', authRoutes);
 // Admin-only user management — protected by JWT + role check
 app.use('/api/users', verifyToken, requireRole(['Admin']), userRoutes);
 
-// Course & Class management — Admin + Staff
-app.use('/api/courses', verifyToken, requireRole(['Admin', 'Staff']), courseRoutes);
-app.use('/api/classes', verifyToken, requireRole(['Admin', 'Staff']), classRoutes);
-app.use('/api/materials', verifyToken, requireRole(['Admin', 'Staff']), materialRoutes);
+// Course & Class management — Admin + Staff + Sale (Sale has read-only access via their Academy page)
+app.use('/api/courses',   verifyToken, requireRole(['Admin', 'Staff', 'Sale']), courseRoutes);
+app.use('/api/classes',   verifyToken, requireRole(['Admin', 'Staff', 'Sale']), classRoutes);
+app.use('/api/materials', verifyToken, requireRole(['Admin', 'Staff', 'Sale']), materialRoutes);
 
 // Health check
 app.get('/', (_req, res) => {
@@ -191,22 +191,46 @@ app.listen(PORT, async () => {
       console.log('Database seed: Course sample data inserted');
     }
 
+    // Migration: Class.schedule_info column
+    const [[scheduleInfoCol]] = await pool.query(
+      `SELECT COLUMN_NAME FROM information_schema.COLUMNS
+       WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'Class' AND COLUMN_NAME = 'schedule_info'`
+    );
+    if (!scheduleInfoCol) {
+      await pool.query("ALTER TABLE `Class` ADD COLUMN schedule_info VARCHAR(20) DEFAULT NULL AFTER capacity");
+      console.log('Database migration: Class.schedule_info column added');
+    }
+
+    // Migration: fix any schedule_info values that are not in the allowed set
+    const [fixedRows] = await pool.query(`
+      UPDATE \`Class\`
+      SET schedule_info = CASE
+        WHEN (class_id % 2) = 1 THEN 'MON-WED-FRI'
+        ELSE 'TUE-THUR-SAT'
+      END
+      WHERE schedule_info NOT IN ('MON-WED-FRI', 'TUE-THUR-SAT')
+         OR schedule_info IS NULL
+    `);
+    if (fixedRows.affectedRows > 0) {
+      console.log(`Database migration: ${fixedRows.affectedRows} Class row(s) schedule_info corrected`);
+    }
+
     const [[{ classCount }]] = await pool.query('SELECT COUNT(*) AS classCount FROM `Class`');
     if (classCount === 0) {
       await pool.query(`
-        INSERT INTO \`Class\` (course_id, class_name, teacher_name, start_date, end_date, capacity, status) VALUES
-        (1, 'ENG-2026-01',  'Nguyen Thi Lan',  '2026-01-10', '2026-04-10', 25, 'Active'),
-        (1, 'ENG-2026-02',  'Tran Van Minh',   '2026-02-15', '2026-05-15', 20, 'Active'),
-        (1, 'ENG-2026-03',  'Le Thi Hoa',      '2026-04-20', '2026-07-20', 30, 'Waiting for Activation'),
-        (2, 'MATH-2026-01', 'Pham Van Duc',    '2026-02-01', '2026-05-01', 20, 'Active'),
-        (2, 'MATH-2026-02', 'Hoang Thi Mai',   '2026-04-10', '2026-07-10', 25, 'Waiting for Activation'),
-        (3, 'PROG-2026-01', 'Nguyen Van Khoa', '2026-03-01', '2026-06-01', 30, 'Active'),
-        (3, 'PROG-2026-02', 'Bui Thi Thu',     '2026-05-01', '2026-08-01', 28, 'Waiting for Activation'),
-        (4, 'DSA-2026-01',  'Vo Minh Tuan',    '2026-05-01', '2026-08-01', 20, 'Waiting for Activation'),
-        (5, 'EOB-2026-01',  'Nguyen Thi Lan',  '2026-03-20', '2026-06-20', 20, 'Active'),
-        (5, 'EOB-2026-02',  'Tran Thi Bich',   '2026-05-10', '2026-08-10', 18, 'Waiting for Activation'),
-        (8, 'COM-2025-01',  'Le Van Phong',    '2025-09-01', '2026-01-01', 30, 'Finish'),
-        (8, 'COM-2025-02',  'Pham Thi Ngoc',   '2025-10-01', '2026-02-01', 25, 'Finish')
+        INSERT INTO \`Class\` (course_id, class_name, teacher_name, start_date, end_date, capacity, schedule_info, status) VALUES
+        (1, 'ENG-2026-01',  'Nguyen Thi Lan',  '2026-01-10', '2026-04-10', 25, 'MON-WED-FRI', 'Active'),
+        (1, 'ENG-2026-02',  'Tran Van Minh',   '2026-02-15', '2026-05-15', 20, 'TUE-THUR-SAT', 'Active'),
+        (1, 'ENG-2026-03',  'Le Thi Hoa',      '2026-04-20', '2026-07-20', 30, 'TUE-THUR-SAT', 'Waiting for Activation'),
+        (2, 'MATH-2026-01', 'Pham Van Duc',    '2026-02-01', '2026-05-01', 20, 'MON-WED-FRI', 'Active'),
+        (2, 'MATH-2026-02', 'Hoang Thi Mai',   '2026-04-10', '2026-07-10', 25, 'TUE-THUR-SAT', 'Waiting for Activation'),
+        (3, 'PROG-2026-01', 'Nguyen Van Khoa', '2026-03-01', '2026-06-01', 30, 'TUE-THUR-SAT', 'Active'),
+        (3, 'PROG-2026-02', 'Bui Thi Thu',     '2026-05-01', '2026-08-01', 28, 'MON-WED-FRI', 'Waiting for Activation'),
+        (4, 'DSA-2026-01',  'Vo Minh Tuan',    '2026-05-01', '2026-08-01', 20, 'TUE-THUR-SAT', 'Waiting for Activation'),
+        (5, 'EOB-2026-01',  'Nguyen Thi Lan',  '2026-03-20', '2026-06-20', 20, 'MON-WED-FRI', 'Active'),
+        (5, 'EOB-2026-02',  'Tran Thi Bich',   '2026-05-10', '2026-08-10', 18, 'TUE-THUR-SAT', 'Waiting for Activation'),
+        (8, 'COM-2025-01',  'Le Van Phong',    '2025-09-01', '2026-01-01', 30, 'TUE-THUR-SAT', 'Finish'),
+        (8, 'COM-2025-02',  'Pham Thi Ngoc',   '2025-10-01', '2026-02-01', 25, 'MON-WED-FRI', 'Finish')
       `);
       console.log('Database seed: Class sample data inserted');
     }

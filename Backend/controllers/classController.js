@@ -10,7 +10,9 @@ export const getClasses = async (_req, res) => {
   try {
     const [rows] = await pool.query(
       `SELECT c.class_id, c.class_name, c.teacher_name,
-              c.start_date, c.end_date, c.capacity, c.status,
+              DATE_FORMAT(c.start_date, '%Y-%m-%d') AS start_date,
+              DATE_FORMAT(c.end_date,   '%Y-%m-%d') AS end_date,
+              c.capacity, c.schedule_info, c.status,
               co.course_id, co.course_name
        FROM \`Class\` c
        JOIN Course co ON c.course_id = co.course_id
@@ -28,7 +30,7 @@ export const createClass = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) return validationFail(res, errors);
 
-  const { course_id, class_name, teacher_name, start_date, end_date, capacity, status } = req.body;
+  const { course_id, class_name, teacher_name, start_date, end_date, capacity, schedule_info, status } = req.body;
   const createdBy = req.user?.userId || null;
 
   try {
@@ -59,9 +61,9 @@ export const createClass = async (req, res) => {
     const finalStatus = status || 'Waiting for Activation';
 
     const [result] = await pool.query(
-      `INSERT INTO \`Class\` (course_id, class_name, teacher_name, start_date, end_date, capacity, status, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [course_id, class_name.trim(), teacher_name.trim(), start_date, end_date || null, capacity, finalStatus, createdBy]
+      `INSERT INTO \`Class\` (course_id, class_name, teacher_name, start_date, end_date, capacity, schedule_info, status, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [course_id, class_name.trim(), teacher_name.trim(), start_date, end_date || null, capacity, schedule_info || null, finalStatus, createdBy]
     );
 
     return res.status(201).json({ message: 'Class created successfully.', class_id: result.insertId });
@@ -77,7 +79,7 @@ export const updateClass = async (req, res) => {
   if (!errors.isEmpty()) return validationFail(res, errors);
 
   const classId = parseInt(req.params.id, 10);
-  const { course_id, class_name, teacher_name, start_date, end_date, capacity, status } = req.body;
+  const { course_id, class_name, teacher_name, start_date, end_date, capacity, schedule_info, status } = req.body;
 
   try {
     const [[existing]] = await pool.query(
@@ -98,11 +100,18 @@ export const updateClass = async (req, res) => {
     );
     if (dup) return res.status(409).json({ message: 'Class name already exists for this course.' });
 
+    // AC: start date must be today or future
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const start = new Date(start_date);
+    if (start < today) {
+      return res.status(400).json({ message: 'Start date must be today or a future date.' });
+    }
+
     await pool.query(
       `UPDATE \`Class\`
-       SET course_id=?, class_name=?, teacher_name=?, start_date=?, end_date=?, capacity=?, status=?
+       SET course_id=?, class_name=?, teacher_name=?, start_date=?, end_date=?, capacity=?, schedule_info=?, status=?
        WHERE class_id=?`,
-      [course_id, class_name.trim(), teacher_name.trim(), start_date, end_date || null, capacity, status, classId]
+      [course_id, class_name.trim(), teacher_name.trim(), start_date, end_date || null, capacity, schedule_info || null, status, classId]
     );
 
     return res.status(200).json({ message: 'Class updated successfully.' });

@@ -7,6 +7,11 @@ export default function StaffHomePage() {
   const navigate = useNavigate();
   const [showLogout, setShowLogout] = useState(false);
 
+  const user = (() => {
+    try { return JSON.parse(localStorage.getItem('user')); } catch { return null; }
+  })();
+  const displayName = user?.username || 'Staff';
+
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
     localStorage.removeItem('user');
@@ -55,7 +60,7 @@ export default function StaffHomePage() {
         <div className="sidebar-user-wrap">
           <div className="sidebar-user">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span>Vu Lan Huong</span>
+            <span>{displayName}</span>
           </div>
           <button className="sidebar-logout-btn" title="Logout" onClick={() => setShowLogout(true)}>
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -78,7 +83,7 @@ export default function StaffHomePage() {
 
         {/* Top bar */}
         <div className="staff-topbar">
-          <h2 className="staff-welcome">Welcome Staff to dashbroad!</h2>
+          <h2 className="staff-welcome">Welcome {displayName} to dashboard!</h2>
           <div className="staff-search">
             <input type="text" placeholder="Customer" />
             <svg viewBox="0 0 24 24" fill="none" stroke="#888" strokeWidth="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

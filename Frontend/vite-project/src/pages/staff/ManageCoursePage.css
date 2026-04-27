@@ -154,6 +154,13 @@
   line-height: 1.4;
 }
 
+.mcp-card-duration {
+  font-size: 10px;
+  color: #6c63ff;
+  margin: 2px 0 0;
+  font-weight: 500;
+}
+
 /* ── Status badges ── */
 .mcp-status {
   font-size: 11px;
@@ -663,6 +670,58 @@
 }
 
 .mat-info-value a:hover { text-decoration: underline; }
+
+/* ── File quick-action row (View / Download) ── */
+.mat-file-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.mat-file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  flex: 1;
+  justify-content: center;
+  padding: 9px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  border: 1.5px solid transparent;
+  white-space: nowrap;
+}
+
+.mat-file-btn--view {
+  background: #eef4ff;
+  color: #1a3a5c;
+  border-color: #c7d9f5;
+}
+
+.mat-file-btn--view:hover {
+  background: #dceeff;
+  border-color: #1a3a5c;
+}
+
+.mat-file-btn--dl {
+  background: #eafaf1;
+  color: #1a5c3a;
+  border-color: #b7e4cc;
+}
+
+.mat-file-btn--dl:hover {
+  background: #d4f5e4;
+  border-color: #1a5c3a;
+}
+
+.mat-file-btn--disabled {
+  opacity: 0.38;
+  cursor: default;
+  pointer-events: none;
+}
 
 /* ── Info actions ── */
 .mat-info-actions {
