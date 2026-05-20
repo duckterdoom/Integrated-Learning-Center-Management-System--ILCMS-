@@ -1,0 +1,6 @@
+# IDE / tool config
+.claude/
+
+# OS
+.DS_Store
+Thumbs.db

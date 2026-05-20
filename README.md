@@ -4,30 +4,80 @@ A web-based management platform for learning centers, supporting three user role
 
 ---
 
-## Table of Contents
-
-1. [Tech Stack](#tech-stack)
-2. [Hướng dẫn cài đặt cho Tester / BA (Tiếng Việt)](#hướng-dẫn-cài-đặt-cho-tester--ba-tiếng-việt)
-3. [Tester / BA Setup Guide (English)](#tester--ba-setup-guide-english)
-4. [Login Accounts / Tài khoản đăng nhập](#login-accounts--tài-khoản-đăng-nhập)
-5. [Project Structure](#project-structure)
-6. [Troubleshooting / Xử lý lỗi](#troubleshooting--xử-lý-lỗi)
-
----
-
 ## Tech Stack
 
 | Layer    | Technology           | Port |
 |----------|----------------------|------|
 | Frontend | React 19 + Vite      | 5173 |
 | Backend  | Node.js + Express.js | 5000 |
-| Database | MySQL Community      | 3306 |
+| Database | MySQL 8.0            | 3306 |
 
 ---
 
-## Hướng dẫn cài đặt cho Tester / BA (Tiếng Việt)
+## Project Structure
 
-> **Các bước 1–6 chỉ thực hiện MỘT LẦN DUY NHẤT.**
+```
+ILCMS/
+│
+├── database/
+│   └── ilcms_db.sql            ← Full database dump with sample data
+│
+├── Backend/
+│   ├── .env.example            ← Copy to .env and set your DB password
+│   ├── .gitignore
+│   ├── package.json
+│   ├── server.js               ← Entry point (auto-runs DB migrations on start)
+│   ├── config/
+│   │   └── db.js               ← MySQL connection pool
+│   ├── controllers/            ← Business logic
+│   │   ├── authController.js
+│   │   ├── classController.js
+│   │   ├── courseController.js
+│   │   ├── materialController.js
+│   │   └── userController.js
+│   ├── middleware/
+│   │   ├── authMiddleware.js   ← JWT verification + role guard
+│   │   └── validateMiddleware.js ← Request validation rules
+│   ├── routes/
+│   │   ├── auth.js
+│   │   ├── classes.js
+│   │   ├── courses.js
+│   │   ├── materials.js
+│   │   └── users.js
+│   └── uploads/                ← Uploaded material files (git-ignored)
+│
+└── Frontend/
+    └── vite-project/
+        ├── index.html
+        ├── vite.config.js
+        ├── package.json
+        ├── public/
+        │   └── ismart-favicon.png
+        └── src/
+            ├── App.jsx         ← Routes + role-based access control
+            ├── assets/         ← Logo images
+            └── pages/
+                ├── auth/       ← LoginPage
+                ├── admin/      ← AdminHomePage, ManageAccountPage, ManageClassPage, ManageCoursePage
+                ├── staff/      ← StaffHomePage, ManageClassPage, ManageCoursePage
+                └── saler/      ← SalerHomePage, SalerAcademyPage
+```
+
+---
+
+## Login Accounts
+
+| Role  | Username | Password |
+|-------|----------|----------|
+| Admin | `admin`  | `admin123`  |
+| Staff | `staff`  | `staff123`  |
+| Sale  | `sale`   | `sale123`   |
+
+---
+
+## Hướng dẫn cài đặt (Tiếng Việt)
+
+> **Các bước 1–6 chỉ thực hiện MỘT LẦN DUY NHẤT.**  
 > Từ lần sau: mở terminal → chạy Bước 7 và Bước 8 là xong.
 
 ---
@@ -37,7 +87,7 @@ A web-based management platform for learning centers, supporting three user role
 1. Truy cập **https://nodejs.org/en/download**
 2. Chọn phiên bản **LTS** → bấm **Download**
 3. Chạy file vừa tải → bấm **Next** liên tục → bấm **Finish**
-4. Kiểm tra: mở **Command Prompt** → gõ lệnh sau → thấy số phiên bản là thành công ✓
+4. Kiểm tra:
    ```
    node -v
    ```
@@ -47,9 +97,8 @@ A web-based management platform for learning centers, supporting three user role
 ### Bước 2 — Cài đặt Git
 
 1. Truy cập **https://git-scm.com/downloads**
-2. Bấm **Download for Windows**
-3. Chạy file vừa tải → bấm **Next** liên tục → bấm **Finish**
-4. Kiểm tra: mở **Command Prompt** → gõ lệnh sau → thấy số phiên bản là thành công ✓
+2. Bấm **Download for Windows** → chạy file → **Next** → **Finish**
+3. Kiểm tra:
    ```
    git --version
    ```
@@ -59,84 +108,64 @@ A web-based management platform for learning centers, supporting three user role
 ### Bước 3 — Cài đặt MySQL Community Server
 
 1. Truy cập **https://dev.mysql.com/downloads/mysql/**
-2. Bấm **Download** ở mục **MySQL Installer for Windows**
-3. Chọn file **mysql-installer-community** (bản lớn hơn ~450MB)
-4. Chạy file cài đặt:
-   - Chọn **Developer Default** → bấm **Next**
-   - Bấm **Execute** để cài → chờ hoàn tất
-   - Ở bước **Accounts and Roles**: đặt **Root Password** là `root` (hoặc mật khẩu bạn muốn — **ghi nhớ lại**)
-   - Bấm **Next** liên tục → bấm **Finish**
-5. Kiểm tra: mở **Command Prompt** → gõ lệnh sau → thấy số phiên bản là thành công ✓
+2. Tải file **mysql-installer-community** (~450 MB)
+3. Chạy file cài đặt:
+   - Chọn **Developer Default** → **Execute** → chờ hoàn tất
+   - Ở bước **Accounts and Roles**: đặt **Root Password** (ghi nhớ lại)
+   - **Next** liên tục → **Finish**
+4. Kiểm tra:
    ```
    mysql --version
    ```
 
-> ⚠️ **Ghi nhớ mật khẩu root MySQL** — sẽ cần dùng ở Bước 5 và Bước 7.
+> ⚠️ **Ghi nhớ mật khẩu root MySQL** — sẽ dùng ở Bước 5.
 
 ---
 
 ### Bước 4 — Tải source code về máy
 
-Mở **Command Prompt** và chạy lệnh sau (chọn thư mục bạn muốn lưu):
-
 ```bash
 git clone https://github.com/duckterdoom/Integrated-Learning-Center-Management-System--ILCMS-.git C:\ILCMS
 ```
 
-Chờ đến khi tải xong. Thư mục `C:\ILCMS` sẽ được tạo.
-
 ---
 
-### Bước 5 — Cấu hình môi trường Backend
+### Bước 5 — Cấu hình Backend
 
-1. Mở thư mục `C:\ILCMS\Backend` trong **File Explorer**
-2. Tìm file tên `.env` — mở bằng **Notepad**
-3. Sửa dòng `DB_PASSWORD` thành mật khẩu root MySQL bạn đặt ở Bước 3:
+1. Vào thư mục `C:\ILCMS\Backend`
+2. Sao chép file `.env.example` → đổi tên thành `.env`
+3. Mở `.env` bằng Notepad, sửa dòng:
    ```
    DB_PASSWORD=mật_khẩu_của_bạn
    ```
-4. Lưu file lại (**Ctrl + S**)
-
-> Nếu không thấy file `.env`, bật tùy chọn **Show hidden files** trong File Explorer.
+4. Lưu file (**Ctrl + S**)
 
 ---
 
-### Bước 6 — Cài đặt thư viện & Import database
+### Bước 6 — Cài thư viện & Import database
 
-Mở **Command Prompt** và chạy từng lệnh sau theo thứ tự:
-
-**Cài thư viện Backend:**
 ```bash
 cd C:\ILCMS\Backend
 npm install
 ```
 
-**Cài thư viện Frontend:**
 ```bash
 cd C:\ILCMS\Frontend\vite-project
 npm install
 ```
 
-**Import database (có sẵn dữ liệu mẫu):**
 ```bash
 cd C:\ILCMS
 mysql -u root -p < database/ilcms_db.sql
 ```
-Nhập mật khẩu root MySQL khi được hỏi → Enter.
 
-Không có thông báo lỗi = import thành công ✓
-
-> **Ghi chú:** Nếu bỏ qua bước import, hệ thống vẫn hoạt động bình thường — Backend sẽ tự tạo database và chèn dữ liệu mẫu khi khởi động lần đầu (xem Bước 7).
-> Có **3 cách** để có dữ liệu mẫu:
-> 1. Import `database/ilcms_db.sql` như trên (khuyến nghị cho tester)
-> 2. Chạy Backend (`npm run dev`) — tự động tạo và seed dữ liệu
-> 3. Chạy `npm run db:setup` trong thư mục `Backend`
+Nhập mật khẩu root MySQL → Enter. Không có lỗi = import thành công ✓
 
 ---
 
 ### Bước 7 — Khởi động Backend
 
-Mở **Command Prompt** và chạy (giữ cửa sổ này mở trong suốt quá trình dùng app):
+Mở **Command Prompt** và giữ cửa sổ này mở:
 
 ```bash
 cd C:\ILCMS\Backend
@@ -152,7 +181,7 @@ Server running on http://localhost:5000
 
 ### Bước 8 — Khởi động Frontend
 
-Mở **Command Prompt thứ hai** và chạy (giữ cửa sổ này mở):
+Mở **Command Prompt thứ hai** và giữ cửa sổ này mở:
 
 ```bash
 cd C:\ILCMS\Frontend\vite-project
@@ -168,139 +197,92 @@ Thấy dòng này là thành công ✓
 
 ### Bước 9 — Mở ứng dụng
 
-Mở trình duyệt (Chrome/Edge) và truy cập:
-```
-http://localhost:5173
-```
+Mở trình duyệt và truy cập: **http://localhost:5173**
+
+> ⚠️ MySQL Service phải đang chạy. Cả hai cửa sổ terminal phải luôn mở khi dùng app.
 
 ---
 
-> ⚠️ **Lưu ý quan trọng:**
-> - MySQL Service phải đang chạy (tự động sau khi cài)
-> - Cả hai cửa sổ Command Prompt (Bước 7 và Bước 8) phải luôn mở
-> - **Từ lần sau:** chỉ cần chạy lại Bước 7 và Bước 8
+## Setup Guide (English)
 
----
-
-## Tester / BA Setup Guide (English)
-
-> **Steps 1–6 are done ONE TIME ONLY.**
-> From next time: open terminal → run Step 7 and Step 8 only.
+> **Steps 1–6 are done ONE TIME ONLY.**  
+> From next time: run Step 7 and Step 8 only.
 
 ---
 
 ### Step 1 — Install Node.js
 
-1. Go to **https://nodejs.org/en/download**
-2. Click **LTS** version → Download
-3. Run the installer → click **Next** until **Finish**
-4. Verify: open **Command Prompt** → type the command below → should show a version number ✓
-   ```
-   node -v
-   ```
+1. Go to **https://nodejs.org/en/download** → Download **LTS**
+2. Run installer → Next → Finish
+3. Verify: `node -v`
 
 ---
 
 ### Step 2 — Install Git
 
-1. Go to **https://git-scm.com/downloads**
-2. Click **Download for Windows**
-3. Run the installer → click **Next** until **Finish**
-4. Verify: open **Command Prompt** → type the command below → should show a version number ✓
-   ```
-   git --version
-   ```
+1. Go to **https://git-scm.com/downloads** → Download for Windows
+2. Run installer → Next → Finish
+3. Verify: `git --version`
 
 ---
 
 ### Step 3 — Install MySQL Community Server
 
 1. Go to **https://dev.mysql.com/downloads/mysql/**
-2. Click **Download** under **MySQL Installer for Windows**
-3. Choose the **mysql-installer-community** file (the larger one ~450MB)
-4. Run the installer:
-   - Select **Developer Default** → click **Next**
-   - Click **Execute** to install → wait for completion
-   - At **Accounts and Roles**: set **Root Password** to `root` (or your own — **write it down**)
-   - Click **Next** until **Finish**
-5. Verify: open **Command Prompt** → type the command below → should show a version number ✓
-   ```
-   mysql --version
-   ```
+2. Download **mysql-installer-community** (~450 MB)
+3. Run installer: select **Developer Default** → Execute → at **Accounts and Roles** set a Root Password → Next → Finish
+4. Verify: `mysql --version`
 
-> ⚠️ **Remember your MySQL root password** — you will need it in Step 5 and Step 6.
+> ⚠️ **Remember your MySQL root password** — needed in Step 5.
 
 ---
 
 ### Step 4 — Clone the Project
 
-Open **Command Prompt** and run:
-
 ```bash
 git clone https://github.com/duckterdoom/Integrated-Learning-Center-Management-System--ILCMS-.git C:\ILCMS
 ```
 
-Wait until it finishes. The folder `C:\ILCMS` will be created.
-
 ---
 
-### Step 5 — Configure Backend Environment
+### Step 5 — Configure Backend
 
-1. Open `C:\ILCMS\Backend` in **File Explorer**
-2. Find the file named `.env` — open it with **Notepad**
-3. Edit the `DB_PASSWORD` line to match your MySQL root password from Step 3:
+1. Go to `C:\ILCMS\Backend`
+2. Copy `.env.example` → rename to `.env`
+3. Open `.env` in Notepad and set:
    ```
-   DB_PASSWORD=your_password_here
+   DB_PASSWORD=your_mysql_password
    ```
-4. Save the file (**Ctrl + S**)
-
-> If you cannot see `.env`, enable **Show hidden items** in File Explorer options.
+4. Save (**Ctrl + S**)
 
 ---
 
 ### Step 6 — Install Dependencies & Import Database
 
-Open **Command Prompt** and run each command in order:
-
-**Install Backend dependencies:**
 ```bash
-cd C:\ILCMS\Backend
-npm install
+cd C:\ILCMS\Backend && npm install
+cd C:\ILCMS\Frontend\vite-project && npm install
 ```
 
-**Install Frontend dependencies:**
-```bash
-cd C:\ILCMS\Frontend\vite-project
-npm install
-```
-
-**Import the database (includes sample data):**
 ```bash
 cd C:\ILCMS
 mysql -u root -p < database/ilcms_db.sql
 ```
-Enter your MySQL root password when prompted → press Enter.
 
-No error messages = database imported successfully ✓
-
-> **Note:** If you skip the import, the system still works — the Backend automatically creates the database and inserts sample data on first startup (see Step 7).
-> There are **3 ways** to get sample data:
-> 1. Import `database/ilcms_db.sql` as above (recommended for testers)
-> 2. Run the Backend (`npm run dev`) — auto-creates and seeds data
-> 3. Run `npm run db:setup` inside the `Backend` folder
+Enter your MySQL root password → Enter. No errors = success ✓
 
 ---
 
 ### Step 7 — Start the Backend
 
-Open **Command Prompt** and run (keep this window open while using the app):
+Keep this window open:
 
 ```bash
 cd C:\ILCMS\Backend
 npm run dev
 ```
 
-You should see ✓
+Success output:
 ```
 Server running on http://localhost:5000
 ```
@@ -309,14 +291,14 @@ Server running on http://localhost:5000
 
 ### Step 8 — Start the Frontend
 
-Open a **second Command Prompt** and run (keep this window open):
+Open a **second terminal**, keep it open:
 
 ```bash
 cd C:\ILCMS\Frontend\vite-project
 npm run dev
 ```
 
-You should see ✓
+Success output:
 ```
 ➜  Local: http://localhost:5173/
 ```
@@ -325,89 +307,33 @@ You should see ✓
 
 ### Step 9 — Open the App
 
-Open your browser (Chrome/Edge) and go to:
-```
-http://localhost:5173
-```
+Open **http://localhost:5173** in your browser.
+
+> ⚠️ MySQL Service must be running. Both terminal windows must stay open.
 
 ---
 
-> ⚠️ **Important:**
-> - MySQL Service must be running (starts automatically after install)
-> - Both Command Prompt windows (Steps 7 and 8) must stay open
-> - **From next time:** just run Step 7 and Step 8 again
+## Troubleshooting
 
----
+**`mysql` is not recognized**
+- Add MySQL to PATH: search **"Edit system environment variables"** → Environment Variables → Path → Add `C:\Program Files\MySQL\MySQL Server 8.0\bin` → restart terminal
 
-## Login Accounts / Tài khoản đăng nhập
+**Cannot import database**
+- Make sure MySQL service is running: Start menu → search **Services** → find **MySQL80** → Start
 
-| Role / Vai trò | Username | Password  |
-|----------------|----------|-----------|
-| Admin          | `admin`  | `admin`   |
-| Staff          | `staff`  | `staff`   |
-| Sale           | `sale`   | `sale`    |
+**`npm install` fails**
+- Confirm Node.js is installed: `node -v`
+- Delete `node_modules/` folder and run `npm install` again
 
----
+**"Invalid username or password" on login**
+- Confirm the database was imported (Step 6)
+- Confirm the Backend terminal is still running on port 5000
 
-## Project Structure
+**Blank page or "Cannot GET /"**
+- Confirm the Frontend terminal is still running: go to `http://localhost:5173` (not 5000)
 
-```
-ILCMS/
-├── database/
-│   ├── ilcms_db.sql                ← ✅ Full database dump with sample data (import this)
-│   └── README.md                   ← Quick import instructions
-│
-├── Backend/                        ← Node.js + Express API
-│   ├── config/
-│   │   └── db.js                   ← MySQL connection pool
-│   ├── controllers/                ← Business logic (auth, users, courses, classes)
-│   ├── database/
-│   │   ├── export.js               ← Re-export database anytime: npm run db:export
-│   │   ├── setup.js                ← One-time setup: creates DB + tables + seeds all data
-│   │   └── seed.js                 ← Seeds Admin account only
-│   ├── middleware/                 ← JWT auth, request validation
-│   ├── routes/                     ← API route definitions
-│   ├── uploads/                    ← Uploaded material files (not tracked by Git)
-│   ├── .env                        ← Environment config (set DB_PASSWORD)
-│   └── server.js                   ← App entry point (auto-seeds data on first run)
-│
-└── Frontend/
-    └── vite-project/               ← React + Vite app
-        └── src/
-            ├── App.jsx             ← Routes and role-based access control
-            ├── assets/             ← Logo images
-            └── pages/
-                ├── auth/           ← LoginPage (with Forgot Password)
-                ├── admin/          ← AdminHomePage, ManageAccountPage, ManageClassPage
-                ├── staff/          ← StaffHomePage, ManageClassPage, ManageCoursePage
-                └── saler/          ← SalerHomePage, SalerAcademyPage
-```
-
----
-
-## Troubleshooting / Xử lý lỗi
-
-**`mysql` is not recognized / Không nhận lệnh mysql**
-- MySQL was not added to PATH during install
-- Fix: Search **"Edit the system environment variables"** → Environment Variables → Path → Add `C:\Program Files\MySQL\MySQL Server 8.0\bin`
-- Then restart Command Prompt and retry
-
-**Error importing database / Lỗi khi import database**
-- Make sure MySQL service is running: open **Services** (search in Start menu) → find **MySQL80** → Start
-- Check your password in `.env` matches what you set during MySQL install
-
-**`npm install` fails / thất bại**
-- Verify Node.js is installed: type `node -v`
-- Delete the `node_modules` folder and run `npm install` again
-
-**Login shows "Invalid username or password" / Đăng nhập báo sai**
-- Check the database was imported correctly (Step 6)
-- Make sure the Backend window is still running (port 5000)
-
-**Blank page / "Cannot GET /" / Trang trắng**
-- Check the Frontend window is still running (port 5173)
-- Go to `http://localhost:5173` — not `http://localhost:5000`
-
-**Port already in use / Cổng đang bị chiếm**
-- Close any other Node.js processes or restart your computer
-- Run `netstat -ano | findstr :5000` to see what is using the port
+**Port already in use**
+- Close other Node.js processes, or run:
+  ```
+  netstat -ano | findstr :5000
+  ```

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ismartLogo from '../../assets/ismart-logo.png';
 import './SalerHomePage.css';
 import SalerAcademyPage from './SalerAcademyPage';
 
@@ -99,7 +100,7 @@ export default function SalerHomePage() {
       <aside className="sl-sidebar">
 
         <div className="sl-sidebar-logo">
-          <img src="/image.png" alt="iSmart – Transforming Education" />
+          <img src={ismartLogo} alt="iSmart – Transforming Education" />
         </div>
 
         <nav className="sl-nav">
